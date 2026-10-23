@@ -7,7 +7,7 @@ Bonsai is a graphical, event-based language. Its capacity to interact with vario
 
 To generate many moving dots in the scene, it would be more efficient to write extension codes than to build workflow in Bonsai GUI.
 
-This article introduces how to write such a extension code that can be used to generate moving dots[https://bonsai-rx.org/docs/tutorials/scripting.html].
+This [tutorial](https://bonsai-rx.org/docs/tutorials/scripting.html) introduces how to write such a extension code that can be used to generate moving dots.
 
 Visual stimuli generated with BonVision package are optimised to one viewing point (for rendering stimuli at a specific size, orientation and location,), so the extension files and the example workflow in this workflow can be applicable to different animal species. As long as they are constrained at a location to receive visual stimuli.
 
