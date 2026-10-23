@@ -8,7 +8,7 @@ using System.Reactive.Linq;
 public class MotionCoherenceParams
 {
     public float? Duration { get; set; }
-    public float? Size { get; set; } 
+    public float? Size { get; set; }
     public int? dotLifeBool { get; set; }
     public int? dotLifetime { get; set; }
     public float? Colour1 { get; set; }
@@ -26,6 +26,7 @@ public class MotionCoherenceParams
     public float? VelocityY2 { get; set; }
     public float? Coherence1 { get; set; }
     public float? Coherence2 { get; set; }
+    public float? SyncPulseValue { get; set; }
 
 }
 
@@ -38,9 +39,9 @@ public class MotionCoherenceSpecification
 
     public List<MotionCoherenceParams> Trials
     {
-        get { return trials;}
+        get { return trials; }
     }
-    
+
     public IObservable<MotionCoherenceParams> Process()
     {
         return trials.ToObservable();
