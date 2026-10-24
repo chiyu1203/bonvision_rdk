@@ -1,5 +1,5 @@
-# BonVision random dot kinematogram in Bonsai
-This is a repository storing a workflow to present random dot kinematogram with BonVision package in Bonsai.
+# BonVision random dot kinematogram
+This is a repository storing a workflow to present random dot kinematogram with [BonVision](https://bonvision.github.io/) package in [Bonsai](https://bonsai-rx.org/).
 
 A random dot kinematogram is a motion‑perception protocol consisting of circular dots moving in the whole field. Some of the dots move coherently in one direction (signal) while others move randomly (noise).
 

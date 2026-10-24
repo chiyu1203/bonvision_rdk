@@ -1,0 +1,398 @@
+{
+  "version": "1",
+  "metadata": {
+    "marimo_version": "0.17.6"
+  },
+  "cells": [
+    {
+      "id": "Hbol",
+      "code_hash": "77831c3caee898f3f434af3536501160",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"session-0-loading-package-depandancies-and-environmental-variables\">Session 0: loading package depandancies and environmental variables</h2></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "lEQa",
+      "code_hash": "09c96191240446f36be4a52ac4ad4f32",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"session-01-loading-analysis-methods-into-a-dictionary-variable\">Session 0.1: Loading analysis methods into a dictionary variable</h3></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "SFPL",
+      "code_hash": "5bb8f9c09b93bd5dcd70131877527f73",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\">Session 0.2: Download the database from Zenodo</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "RGSE",
+      "code_hash": "53cd2d9d3dd98707cd63543ad100ae9c",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"session-1-loading-dataset-as-pandas-dataframe\">Session 1: Loading dataset as pandas dataframe</h2></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "emfo",
+      "code_hash": "2de7b413bdfc7abaaad104e4e1533ccd",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"session-2-visualising-visually-evoked-angular-velocity\">Session 2: Visualising visually-evoked angular velocity</h2></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "ZHCJ",
+      "code_hash": "2f61c6657ca3b027a3b4bca6476da0ea",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"session-3-analysing-temporal-patterns-of-the-steering-event\">Session 3: Analysing temporal patterns of the steering event</h2></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "ROlb",
+      "code_hash": "09ae03b4fcc49c27c90adbb59a5e971c",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"session-31-converting-angular-velocity-into-the-steering-event\">Session 3.1: Converting angular velocity into the steering event</h3></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "DnEU",
+      "code_hash": "a16d080471a9afe2e3ca530bd066d520",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"session-32-a-gui-to-output-fitting-results-with-varying-parameters\">Session 3.2: A GUI to output fitting results with varying parameters</h3></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "nHfw",
+      "code_hash": "59bf3e17b46f6a99c5c7a4409ae86cf7",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"session-32-visualising-steering-event\">Session 3.2: Visualising steering event</h3></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "NCOB",
+      "code_hash": "9a38260370a964dab108dc9601d3592f",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"session-4-applying-survival-analysisreliability-engineering-to-steering-events\">Session 4: Applying survival analysis/reliability engineering to steering events</h2></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "aqbW",
+      "code_hash": "01fc868f3b6a9d6a4faca36d0b89fca0",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"session41-using-fit_everything-function-to-compare-the-performance-of-each-model\">Session4.1: Using Fit_everything function to compare the performance of each model.</h3></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "TRpd",
+      "code_hash": "05bcba079a61c8e790908127d5b18209",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h4 id=\"the-fit_everything-function-can-output-parameter-values-log-likelihood-aic-and-bic\">The Fit_everything function can output parameter values, log-likelihood, AIC and BIC.</h4></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "yCnT",
+      "code_hash": "427c950a3fdf636101a1ff1261a4f0a6",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h4 id=\"to-output-the-confidence-interval-of-each-parameter-it-is-required-to-apply-speicific-fitting-functions-for-example-fit_weibull_2p-these-functions-accept-the-same-input-arguement\">To output the confidence interval of each parameter, it is required to apply speicific fitting functions, for example: Fit_Weibull_2P, these functions accept the same input arguement.</h4></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "kqZH",
+      "code_hash": "01aa9a89f4d41ae4f5171ee94410c027",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"session-41-using-heatmap-to-visualise-shape-parameter\">Session 4.1: Using heatmap to visualise shape parameter</h3></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "SdmI",
+      "code_hash": "cd86dcaccef31f4370030bd29778ce06",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"session-5-others-in-the-dataset\">Session 5: Others in the dataset</h2></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "lgWD",
+      "code_hash": "055d5e8b19e63844e28b728db0b1407d",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"session-51-visualising-travel-distance-in-the-dataset\">Session 5.1: visualising travel distance in the dataset</h3></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "MJUe",
+      "code_hash": "1d0db38904205bec4d6f6f6a1f6cec3e",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "vblA",
+      "code_hash": "d51d923fa78b032b4c82c7b7f3cdc207",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "bkHC",
+      "code_hash": "efd81388a1d9bd22e26b243812c94685",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "PKri",
+      "code_hash": "619fd9ab2758329457c839991ce6e3d1",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "Xref",
+      "code_hash": "6bd8cf7c6afa2356764505187e44a871",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "BYtC",
+      "code_hash": "aa253dbfb7d4736ed21403ad5439a0cb",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "Kclp",
+      "code_hash": "cca198fbc24598bbf0537419f8caffcf",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "Hstk",
+      "code_hash": "b7c0707d8467005178e8e7e6f745f562",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "nWHF",
+      "code_hash": "a1f1fcdf550175f77b8ba1344bf6e760",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "iLit",
+      "code_hash": "04d8b0d72264ac23a02fdafcc5fb364e",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "qnkX",
+      "code_hash": "9537f1043a3f2db30cffa8858eff1cb6",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "TqIu",
+      "code_hash": "1925e47628f38b59681b8c512e30a29d",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "Vxnm",
+      "code_hash": "27191787685bb6b7aa471b96e448f1b9",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "ulZA",
+      "code_hash": "3a8933141d8b4924a67f75d438e48e6a",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "ecfG",
+      "code_hash": "8bd334bfd4fc8fa4d12baaaaa7043c33",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "Pvdt",
+      "code_hash": "0d3366c67f844dafe64e2e2c0d338337",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "ZBYS",
+      "code_hash": "702b36bb1c3d8d4b96ec38d377da6a76",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "aLJB",
+      "code_hash": "a7c2c90982e4c4de699c2deca22dbff9",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "xXTn",
+      "code_hash": "8ce70460e9447d2f381170c1b91e79ce",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "AjVT",
+      "code_hash": "2d2833d2b310bcdf0bfb0fd1c33a74db",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "pHFh",
+      "code_hash": "ec3912443904c99f9f41ef6299a349c9",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "TXez",
+      "code_hash": "f97f56fdf982825b6f23782444aafc90",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "dNNg",
+      "code_hash": "9f2768d2864cd5283f31bfd4d429ee1b",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "wlCL",
+      "code_hash": "00e7977faf21a53542bbd8ae4bbd556f",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "wAgl",
+      "code_hash": "1724b3b034cf59ad3f094ddb15e2d63d",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "rEll",
+      "code_hash": "c2016d1757904214e4cc6b9de1a2aa76",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "dGlV",
+      "code_hash": "6f97d0e0709b433cd723063793af38ed",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "yOPj",
+      "code_hash": "469ba0d58bc4fa3cf65aaba984a91082",
+      "outputs": [],
+      "console": []
+    }
+  ]
+}

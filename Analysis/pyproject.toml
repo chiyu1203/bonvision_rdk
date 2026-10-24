@@ -1,0 +1,32 @@
+[project]
+name = "analysis"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "chiyu1203", email = "chiyu1203@gmail.com" }
+]
+requires-python = ">=3.9"
+dependencies = [
+    "deepdiff>=8.6.2",
+    "fastparquet>=2024.11.0",
+    "h5py>=3.14.0",
+    "ipyparallel>=9.0.2",
+    "marimo>=0.17.6",
+    "matplotlib>=3.9.4",
+    "numpy>=2.0.2",
+    "pandas>=2.3.3",
+    "pyarrow>=21.0.0",
+    "reliability>=0.8.16",
+    "scipy>=1.13.1",
+    "seaborn>=0.13.2",
+    "tables>=3.9.2",
+    "zenodo-get>=1.6.1",
+]
+
+[project.scripts]
+analysis = "analysis:main"
+
+[build-system]
+requires = ["uv_build>=0.13.5,<0.14.0"]
+build-backend = "uv_build"
