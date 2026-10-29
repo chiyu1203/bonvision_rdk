@@ -17,6 +17,103 @@ class MplColorHelper:
 
     def get_rgb(self, val):
         return self.scalarMap.to_rgba(val)
+def converting_follow_velocity(row):
+    if row['stim_type'] < 0:
+        row['stim_type'] = row['stim_type'] * -1  # Check condition on the first column
+        row.loc['angular_velocity_f0':] = row.loc['angular_velocity_f0':] * -1
+    return row
+
+def heatmap(data, row_labels, col_labels, ax=None,
+            cbar_kw=None, cbarlabel="", **kwargs):
+    """
+    Create a heatmap from a numpy array and two lists of labels.
+
+    Parameters
+    ----------
+    data
+        A 2D numpy array of shape (M, N).
+    row_labels
+        A list or array of length M with the labels for the rows.
+    col_labels
+        A list or array of length N with the labels for the columns.
+    ax
+        A `matplotlib.axes.Axes` instance to which the heatmap is plotted.  If
+        not provided, use current Axes or create a new one.  Optional.
+    cbar_kw
+        A dictionary with arguments to `matplotlib.Figure.colorbar`.  Optional.
+    cbarlabel
+        The label for the colorbar.  Optional.
+    **kwargs
+        All other arguments are forwarded to `imshow`.
+    """
+
+    if ax is None:
+        ax = plt.gca()
+
+    if cbar_kw is None:
+        cbar_kw = {}
+
+    # Plot the heatmap
+    im = ax.imshow(data,cmap='coolwarm',vmin=0,vmax=2,**kwargs)
+
+    # Create colorbar
+    cbar = ax.figure.colorbar(im, ax=ax, orientation="horizontal", location='top',aspect=80 ,**cbar_kw)
+    cbar.ax.set_ylabel(cbarlabel,rotation=-90,va="bottom")
+
+
+    # Show all ticks and label them with the respective list entries.
+    ax.set_xticks(range(data.shape[1]), labels=col_labels,
+                  rotation=-30, rotation_mode="xtick")
+    ax.set_yticks(range(data.shape[0]), labels=row_labels)
+    # Let the horizontal axes labeling appear on top.
+    ax.tick_params(top=False, bottom=True,
+                   labeltop=False, labelbottom=True)
+
+    # Turn spines off and create white grid.
+    ax.spines[:].set_visible(False)
+
+    ax.set_xticks(np.arange(data.shape[1]+1)-.5, minor=True)
+    ax.set_xlabel("step size (n consecutive frames)", fontsize=14)
+    ax.set_yticks(np.arange(data.shape[0]+1)-.5, minor=True)
+    ax.set_ylabel(r'threshold (rad s$^{-1}$)', fontsize=14)
+    ax.grid(which="minor", color="w", linestyle='-', linewidth=3)
+    ax.tick_params(which="minor", bottom=False, left=False)
+
+    return im, cbar
+
+def annotate_heatmap(im, data=None, valfmt="{x:.2f}",
+                     textcolors=("black", "white"),
+                     threshold=None, **textkw):
+
+    if not isinstance(data, (list, np.ndarray)):
+        data = im.get_array()
+
+    # Normalize the threshold to the images color range.
+    if threshold is not None:
+        threshold = im.norm(threshold)
+    else:
+        threshold = im.norm(data.max())/2.
+
+    # Set default alignment to center, but allow it to be
+    # overwritten by textkw.
+    kw = dict(horizontalalignment="center",
+              verticalalignment="center")
+    kw.update(textkw)
+
+    # Get the formatter in case a string is supplied
+    if isinstance(valfmt, str):
+        valfmt = mpl.ticker.StrMethodFormatter(valfmt)
+
+    # Loop over the data and create a `Text` for each "pixel".
+    # Change the text's color depending on the data.
+    texts = []
+    for i in range(data.shape[0]):
+        for j in range(data.shape[1]):
+            kw.update(color=textcolors[int(im.norm(data[i, j]) > threshold)])
+            text = im.axes.text(j, i, valfmt(data[i, j], None), **kw)
+            texts.append(text)
+
+    return texts
     
 def plot_yaw_angular_velocity(df,analysis_methods,init_frame=1000,end_frame=3500,vr_no="all",colormap_name="coolwarm"):
     camera_fps=analysis_methods.get("camera_fps")
@@ -31,13 +128,13 @@ def plot_yaw_angular_velocity(df,analysis_methods,init_frame=1000,end_frame=3500
     else:
         ylim_w=(-1.2,1.2)
     ylim_heading=(-150,150)
-    using_bs_ci=False
+    using_bs_ci=True
     use_mean=False
     stimulus_velocity=64 #unit degree/s
     walk_threshold_tbt=10
     premature_turn=0.25#set this criteria to remove animals starting to make turn turing ISI
     fig, axes = plt.subplots(
-        nrows=1, ncols=2, figsize=(12, 8))
+        nrows=2, ncols=1, figsize=(12, 8))
     ax1, ax2 = axes.flatten()
 
     fig_tbt, subplots = plt.subplots(
@@ -123,24 +220,18 @@ def plot_yaw_angular_velocity(df,analysis_methods,init_frame=1000,end_frame=3500
 
         ##to plot distribution with bootstrap 95% confidence interval
         if using_bs_ci:
-            # data=(these_headings,)
-            # res=st.bootstrap(data,np.std,n_resamples=99,vectorized=True,random_state=1)
-            # y1=res.confidence_interval[0]
-            # y2=res.confidence_interval[1]
-            # del data
             confidence_level = 0.95
             #data=(these_angular_velocity,)
-            
+            res=st.bootstrap(data=(these_headings,),statistic=np.median,n_resamples=999,vectorized=True,batch=100,random_state=1)
+            y1=res.confidence_interval[0]
+            y2=res.confidence_interval[1]
             res=st.bootstrap(data=(these_angular_velocity,),statistic=np.median,n_resamples=999,vectorized=True,batch=100,random_state=1)
             w_y1=res.confidence_interval[0]
             w_y2=res.confidence_interval[1]
             ##to plot distribution with 95% confidence interval with normal distribution because it is faster not because it is correct
-            res=st.bootstrap(data=(these_headings,),statistic=np.median,n_resamples=999,vectorized=True,batch=100,random_state=1)
             #cl95=st.norm.interval(confidence_level,loc=headings_to_plot,scale=st.sem(these_headings))
             # y1=cl95[0][:]
             # y2=cl95[1][:]
-            y1=res.confidence_interval[0]
-            y2=res.confidence_interval[1]
             #cl95=st.norm.interval(confidence_level,loc=velocity_to_plot,scale=st.sem(these_angular_velocity))
             # w_y1=cl95[0][:]
             # w_y2=cl95[1][:]

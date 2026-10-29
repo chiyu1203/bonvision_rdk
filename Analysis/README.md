@@ -57,11 +57,17 @@ Y
 ```
 
 To initiate a python project with uv inside an existing folder. In this case, "Analysis"
+
+use 
 ```
 uv init
 ```
+but since this repository have stored the configuration, you can just type the following. It will create a virtual environment using python 3.14 and installed packages listed up in pyproject.
+```
+uv run --locked --python 3.14 marimo edit notebook.py
+```
 
-It seems that there is no need to create a virtual environment inside the project to isolate its python environment from outside, since uv project manages which python to use already. However, it also seems that using a python virtual environment inside a uv project does not harm anything. Therefore, the following command can be used.
+It seems that there is no need to create a virtual environment inside the project to isolate its python environment from outside, since uv project manages which python to use already. However, I wanted to follow my old practice and having a virtual environment inside a uv project does not harm anything. Therefore, the following command can be used.
 ```
 uv venv --python 3.14  
 ```
@@ -71,7 +77,7 @@ To activate the virtual environment:
 .\.venv\Scripts\activate 
 
 ## on Mac/Linux
-source .\.venv\bin\activate
+source ./.venv/bin/activate
 ```
 To add python dependencies inside the project
 ```

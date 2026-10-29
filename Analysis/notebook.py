@@ -1,7 +1,43 @@
 import marimo
 
-__generated_with = "0.17.6"
+__generated_with = "0.25.2"
 app = marimo.App()
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    # Accessing dataset Random Dot Kinematograms in Desert Locusts on Marimo notebook
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ### Marimo notebook is similar to jupyter notebook, where you can interact with codes cell by cell (or block by block). Nevertheless, the biggest difference between the two is that Marimo notebook can automatically synchronise the value of global variables to all of the activated cells. This helps demonstrate a database like this, because you do not need to remember which cell to activate and which one to skip, but it is tricky to prototype a script on Marimo.
+
+    ### A useful tip for new Marimo notebook users: get used to local variables and global variables
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ### What is a local variable on Marimo notebook?
+    ### A variable whose name starts from an _, for example _file_name
+    ### When a local variable gets updated, it will only affect code within the same cell. By contrast, a global variable will affect the entire notebook. Therefore, it is impossible to define two global variables with the same name.
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ### Anyway, let us give it a try.
+    """)
+    return
 
 
 @app.cell(hide_code=True)
@@ -14,24 +50,21 @@ def _(mo):
 
 @app.cell
 def _():
-    import marimo as mo
-    return (mo,)
+    ## A useful function to generate a data list for further analysis
 
-
-@app.cell
-def _():
-    ## a useful function to generate a data list for further analysis
     import os,json
     from pathlib import Path
+    import marimo as mo
     import numpy as np
     import pandas as pd
     import matplotlib.pyplot as plt
     import seaborn as sns
+    from utils import plot_yaw_angular_velocity, boolean_array_to_event_table, bootstrap_cumulative_probability, converting_follow_velocity, heatmap, annotate_heatmap
     #from analyse_stimulus_evoked_response import plot_yaw_angular_velocity
     #from stimulus_gated_weibull import boolean_array_to_event_table
+    #from cumulative_probability_bootstrap import bootstrap_cumulative_probability
     from reliability.Probability_plotting import Exponential_probability_plot
     from reliability.Fitters import Fit_Weibull_2P,Fit_Everything,Fit_Exponential_1P,Fit_Weibull_DS,Fit_Weibull_Mixture,Fit_Exponential_2P
-    #from cumulative_probability_bootstrap import bootstrap_cumulative_probability
     from matplotlib.colors import ListedColormap
     custom_5 = ListedColormap(
         ["blue","cyan","red","magenta", "purple"],
@@ -44,33 +77,19 @@ def _():
         Fit_Weibull_DS,
         Fit_Weibull_Mixture,
         Path,
+        annotate_heatmap,
+        boolean_array_to_event_table,
+        bootstrap_cumulative_probability,
+        converting_follow_velocity,
         custom_5,
+        heatmap,
         json,
+        mo,
         np,
         pd,
+        plot_yaw_angular_velocity,
         plt,
     )
-
-
-@app.cell
-def _(plt):
-    ##introduce some helper class to define colour gradient
-    import matplotlib as mpl
-    from matplotlib import cm
-    class MplColorHelper:
-        def __init__(self, cmap_name, start_val, stop_val):
-            self.cmap_name = cmap_name
-            self.cmap = plt.get_cmap(cmap_name)
-            self.norm = mpl.colors.Normalize(vmin=start_val, vmax=stop_val)
-            self.scalarMap = cm.ScalarMappable(norm=self.norm, cmap=self.cmap)
-
-        def get_rgb(self, val):
-            return self.scalarMap.to_rgba(val)
-    #colormap_name = "viridis"
-    colormap_name = "coolwarm"
-    # COL = MplColorHelper(colormap_name, 0, len(df["stim_type"].unique()))
-    # sm = cm.ScalarMappable(cmap=colormap_name)
-    return (mpl,)
 
 
 @app.cell(hide_code=True)
@@ -82,15 +101,8 @@ def _(mo):
 
 
 @app.cell
-def _():
-    _folder_name = 'MatrexVR'
-    _Datasets = 'Z:/DATA/experiment_trackball_Optomotor'
-    this_dataset_dir = f'{_Datasets}/{_folder_name}'
-    return (this_dataset_dir,)
-
-
-@app.cell
 def _(json):
+    # I used python dict to 
     _file_name = './analysis_methods_dictionary.json'
     with open(_file_name, 'r') as _f:
         analysis_methods = json.loads(_f.read())
@@ -100,7 +112,15 @@ def _(json):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    Session 0.2: Download the database from Zenodo
+    ### Session 0.2: Gaining access to the dataset
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    #### Session 0.2.1 we used a 3-party package zenodo_get to download data from Zenodo (skip this session if you have access to the server of AG Couzin-Fuchs)
     """)
     return
 
@@ -109,23 +129,24 @@ def _(mo):
 def _():
     from zenodo_get import download
 
-    # Download all files from a record
-    download("10.5281/zenodo.1234567", output_dir="./data")
+    #"10.5281/zenodo.23565813" is the dataset ID on Zenodo
 
-    # Download only specific files using glob pattern
-    # download(
-    #     record_or_doi="1234567",
-    #     output_dir="./data",
-    #     file_glob="*.csv",
-    # )
+    #type in where you want to download in output_dir
 
-    # # Multiple glob patterns
-    # download(
-    #     record_or_doi="1234567",
-    #     output_dir="./data",
-    #     file_glob=["*.csv", "*.json"],
-    # )
-    return
+    #specify either the full file name or some pattern of the file name to download the data you want in file_glob
+
+    # For example 
+
+    # to download the curated database, type "*.gzip"
+    # to download the raw database, type "*.zip"
+    # to download the metadata, type "*.xlsx"
+    # typing "*.pdf", will download both the protocol and manuscript, so I would recommend using the full name in this scenario
+
+    # Because the rest of the notebook is about using curated database, here is the code ot download that
+
+    files_local_location="/Users/chiyu_lee/Downloads"
+    download("10.5281/zenodo.23565813",output_dir=files_local_location,file_glob="*.gzip")
+    return (files_local_location,)
 
 
 @app.cell(hide_code=True)
@@ -136,9 +157,27 @@ def _(mo):
     return
 
 
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    Session 1.1 if you have access to the server of AG Couzin-Fuchs, specify the path to where the database is stored. If you download the data from Zenodo, having_server_access to False and then specify where you store the data in this_dataste_dir
+    """)
+    return
+
+
 @app.cell
-def _(Path, pd, this_dataset_dir):
-    _file_name = 'matrex_vr_3coherence_database.parquet.gzip'
+def _(Path, files_local_location, pd):
+    #The benefit of saving database in parquet.gzip is long-term storage but loading it takes time
+    having_server_access=True
+    _folder_name = 'MatrexVR'
+    #_Datasets = 'Z:/DATA/experiment_trackball_Optomotor'
+    _Datasets ='/Volumes/AG_Couzin-Fuchs/DATA/experiment_trackball_Optomotor/'
+    if having_server_access:
+        this_dataset_dir = f'{_Datasets}/{_folder_name}'
+    else:
+        this_dataset_dir = files_local_location
+    
+    _file_name = 'MatrexVR_4coherence_database_rolling_median.parquet.gzip'
     df = pd.read_parquet(Path(this_dataset_dir) / _file_name)
     return (df,)
 
@@ -151,6 +190,14 @@ def _(mo):
     return
 
 
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    #### Session 2.1 load some variables in the analysis methods dictionary into global variables
+    """)
+    return
+
+
 @app.cell
 def _(analysis_methods):
     _camera_fps=analysis_methods.get('camera_fps')
@@ -158,13 +205,14 @@ def _(analysis_methods):
     stim_duration = analysis_methods.get('stim_duration')
     init_frame = _camera_fps * abs(analysis_window[0])
     end_frame = _camera_fps * (abs(analysis_window[0]) + stim_duration)
-    print(init_frame, end_frame)
     return end_frame, init_frame, stim_duration
 
 
 @app.cell
 def _(analysis_methods, df, end_frame, init_frame, plot_yaw_angular_velocity):
-    _colormap_name = "viridis"
+    # To save processing time, let's just include non-stationary trials (travel distance over 10 cm during 25-s stimulus presentation)
+    analysis_methods.update({"active_trials_only":True})
+    _colormap_name = "coolwarm"
     fig,_fig_tbt=plot_yaw_angular_velocity(df,analysis_methods,init_frame,end_frame,"all",_colormap_name)
     _fig_tbt
     return (fig,)
@@ -192,23 +240,16 @@ def _(mo):
     return
 
 
-@app.function
-def converting_follow_velocity(row):
-    if row['stim_type'] < 0:
-        row['stim_type'] = row['stim_type'] * -1  # Check condition on the first column
-        row.loc['angular_velocity_f0':] = row.loc['angular_velocity_f0':] * -1
-    return row
-
-
 @app.cell
-def _(df):
+def _(converting_follow_velocity, df):
     df_angular_speed=df.apply(converting_follow_velocity, axis=1)
     return (df_angular_speed,)
 
 
 @app.cell
 def _(df_angular_speed, end_frame, init_frame):
-    arr = df_angular_speed.iloc[:, init_frame+16:end_frame+16].values
+    _num_trial_info_column=16
+    arr = df_angular_speed.iloc[:, init_frame+_num_trial_info_column:end_frame+_num_trial_info_column].values
     return (arr,)
 
 
@@ -216,6 +257,14 @@ def _(df_angular_speed, end_frame, init_frame):
 def _(mo):
     mo.md(r"""
     ### Session 3.2: A GUI to output fitting results with varying parameters
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    #### 3.2.1 load functions in the notebook. Unlike functions in the untils.py, these functions are stored in the notebook so that users can change it easily. Just remeber to load them first.
     """)
     return
 
@@ -257,6 +306,7 @@ def _(
             output=Fit_Exponential_1P(failures=_faiures, right_censored=_right_censored, show_probability_plot=False)
         else:
             print("unidentified model")
+
     return (fit_model,)
 
 
@@ -272,6 +322,7 @@ def _(boolean_array_to_event_table, camera_fps, np):
         _this_data = _hit_target_epochs[df[_trial_to_analyse].index,]
         _output_table, _ = boolean_array_to_event_table(_this_data, timepoints=timepoints, stimulus_onset=0, consecutive_samples=_this_sample_size)
         return _output_table
+
     return (prepare_input,)
 
 
@@ -291,11 +342,11 @@ def _(mo):
 
 @app.cell
 def _(mo):
-    censored_data = mo.ui.switch(value=True, label="include unsuccessful trials")
+    censored_data = mo.ui.switch(value=True, label="include unsuccessful trials into model fitting")
     model_choice = mo.ui.dropdown(
         options=["Weibull defective subpopulation","Weibull mixtures","Weibull","2-parameter Exponential","Exponential","All of the above"],
         value="Exponential",
-        label="model choices",
+        label="You are using model:",
     )
     mo.hstack([censored_data, model_choice], wrap=True, justify="start")
     return censored_data, model_choice
@@ -303,7 +354,7 @@ def _(mo):
 
 @app.cell
 def _(arr, df, fit_model, form, mo, prepare_input):
-    mo.stop(form.value is None, mo.md("Click **Go, Hidden Scientists!** to fit a model to the data"))
+    mo.stop(form.value is None, mo.md("Click **Go, Hidden Scientists!** to fit a model to the data and adjust the parameters with sliders "))
     _v = form.value
     input_data = prepare_input(_v["sample_size"], _v["speed_thresholds"], _v["coherence_levels"],arr,df)
     fit_model(input_data)
@@ -313,7 +364,7 @@ def _(arr, df, fit_model, form, mo, prepare_input):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ### Session 3.2: Visualising steering event
+    ### Session 3.3: Visualising steering event
     """)
     return
 
@@ -505,130 +556,6 @@ def _(mo):
 
 
 @app.cell
-def _(np, plt):
-    def heatmap(data, row_labels, col_labels, ax=None,
-                cbar_kw=None, cbarlabel="", **kwargs):
-        """
-        Create a heatmap from a numpy array and two lists of labels.
-
-        Parameters
-        ----------
-        data
-            A 2D numpy array of shape (M, N).
-        row_labels
-            A list or array of length M with the labels for the rows.
-        col_labels
-            A list or array of length N with the labels for the columns.
-        ax
-            A `matplotlib.axes.Axes` instance to which the heatmap is plotted.  If
-            not provided, use current Axes or create a new one.  Optional.
-        cbar_kw
-            A dictionary with arguments to `matplotlib.Figure.colorbar`.  Optional.
-        cbarlabel
-            The label for the colorbar.  Optional.
-        **kwargs
-            All other arguments are forwarded to `imshow`.
-        """
-
-        if ax is None:
-            ax = plt.gca()
-
-        if cbar_kw is None:
-            cbar_kw = {}
-
-        # Plot the heatmap
-        im = ax.imshow(data,cmap='coolwarm',vmin=0,vmax=2,**kwargs)
-
-        # Create colorbar
-        cbar = ax.figure.colorbar(im, ax=ax, orientation="horizontal", location='top',aspect=80 ,**cbar_kw)
-        cbar.ax.set_ylabel(cbarlabel,rotation=-90,va="bottom")
-
-
-        # Show all ticks and label them with the respective list entries.
-        ax.set_xticks(range(data.shape[1]), labels=col_labels,
-                      rotation=-30, rotation_mode="xtick")
-        ax.set_yticks(range(data.shape[0]), labels=row_labels)
-        # Let the horizontal axes labeling appear on top.
-        ax.tick_params(top=False, bottom=True,
-                       labeltop=False, labelbottom=True)
-
-        # Turn spines off and create white grid.
-        ax.spines[:].set_visible(False)
-
-        ax.set_xticks(np.arange(data.shape[1]+1)-.5, minor=True)
-        ax.set_xlabel("step size (n consecutive frames)", fontsize=14)
-        ax.set_yticks(np.arange(data.shape[0]+1)-.5, minor=True)
-        ax.set_ylabel(r'threshold (rad s$^{-1}$)', fontsize=14)
-        ax.grid(which="minor", color="w", linestyle='-', linewidth=3)
-        ax.tick_params(which="minor", bottom=False, left=False)
-
-        return im, cbar
-    return (heatmap,)
-
-
-@app.cell
-def _(mpl, np):
-    def annotate_heatmap(im, data=None, valfmt="{x:.2f}",
-                         textcolors=("black", "white"),
-                         threshold=None, **textkw):
-        """
-        A function to annotate a heatmap.
-
-        Parameters
-        ----------
-        im
-            The AxesImage to be labeled.
-        data
-            Data used to annotate.  If None, the image's data is used.  Optional.
-        valfmt
-            The format of the annotations inside the heatmap.  This should either
-            use the string format method, e.g. "$ {x:.2f}", or be a
-            `matplotlib.ticker.Formatter`.  Optional.
-        textcolors
-            A pair of colors.  The first is used for values below a threshold,
-            the second for those above.  Optional.
-        threshold
-            Value in data units according to which the colors from textcolors are
-            applied.  If None (the default) uses the middle of the colormap as
-            separation.  Optional.
-        **kwargs
-            All other arguments are forwarded to each call to `text` used to create
-            the text labels.
-        """
-
-        if not isinstance(data, (list, np.ndarray)):
-            data = im.get_array()
-
-        # Normalize the threshold to the images color range.
-        if threshold is not None:
-            threshold = im.norm(threshold)
-        else:
-            threshold = im.norm(data.max())/2.
-
-        # Set default alignment to center, but allow it to be
-        # overwritten by textkw.
-        kw = dict(horizontalalignment="center",
-                  verticalalignment="center")
-        kw.update(textkw)
-
-        # Get the formatter in case a string is supplied
-        if isinstance(valfmt, str):
-            valfmt = mpl.ticker.StrMethodFormatter(valfmt)
-
-        # Loop over the data and create a `Text` for each "pixel".
-        # Change the text's color depending on the data.
-        texts = []
-        for i in range(data.shape[0]):
-            for j in range(data.shape[1]):
-                kw.update(color=textcolors[int(im.norm(data[i, j]) > threshold)])
-                text = im.axes.text(j, i, valfmt(data[i, j], None), **kw)
-                texts.append(text)
-
-        return texts
-    return (annotate_heatmap,)
-
-
-@app.cell
 def _(
     annotate_heatmap,
     heatmap,
@@ -636,6 +563,7 @@ def _(
     sample_sizes,
     speed_thresholds,
 ):
+    #these two functions were adapted from https://matplotlib.org/3.1.0/gallery/images_contours_and_fields/image_annotated_heatmap.html
     im, cbar = heatmap(ready_to_plot_kappa, list(map(str, speed_thresholds)), sample_sizes.astype(str).tolist())
     texts = annotate_heatmap(im, valfmt='{x:.2f}', fontsize=8)
     im
@@ -660,11 +588,15 @@ def _(mo):
 
 @app.cell
 def _(df, plt):
-    _fig, (_ax1,_ax2) = plt.subplots(nrows=1, ncols=2,figsize=(5, 5))
+    _fig, (_ax1,_ax2) = plt.subplots(nrows=1, ncols=2,figsize=(10, 5))
+    #use pandas's groupby to get a summarised dataframe for every animal.
     df_aba = df.groupby('ID').agg(travel_distance=('travel_distance', 'mean'), travel_distance_isi=('travel_distance_isi', 'mean'), ID=('ID', 'first'))
+    #ax1 is on the left, which plots the distribution of every animal's travel distance
+    #ax2 is on the right, which plots the distribution of the travel distance in every trial
     _ax1.hist(df_aba['travel_distance'])
     _ax2.hist(df['travel_distance'], bins=100)
     _ax2.axvline(x=10, ymin=0, ymax=1, color='red', ls='--')
+    #_fig.savefig("histogram_4coherence.svg")
     _fig
     return
 
