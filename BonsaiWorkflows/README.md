@@ -50,28 +50,37 @@ However, the benefit of using the Portable is that you can install versions of B
 
 
 #### Once the workflow is opened, you will see those nodes connected to each other. In this workflow, they can be subdivided into 4 parts.
-1. Loading packages, resources, and defining global variables. <br />
+1. **Loading packages, resources, and defining global variables** <br />
 **Nodes to change**:<br />
-**CreateWindow** - This node sets up a window where visual stimuli are present. Change TargetRenderFrequency and Height/Width to meet with the spec of your display <br />
+*CreateWindow* - This node sets up a window where visual stimuli are present. Change TargetRenderFrequency and Height/Width to meet with the spec of your display <br />
 
 <img width="488" height="543" alt="Screenshot 2026-10-25 215707" src="https://github.com/user-attachments/assets/45e40832-e549-4081-91b4-874ffa5ab90f" />
 
-**CraeteRandom** - This node defines the random seed of the randomised sequence. Note: I'd recommend screening over a number of random seeds and picking those that result in the least autocorrelation in the random sequence. (inside VarInit)<br />
+*CraeteRandom* - This node defines the random seed of the randomised sequence. Note: I'd recommend screening over a number of random seeds and picking those that result in the least autocorrelation in the random sequence. (inside VarInit)<br />
 <img width="454" height="201" alt="Screenshot 2026-10-25 220707" src="https://github.com/user-attachments/assets/78eb7997-c9fe-40a2-843a-f55ad1ee55bd" />
 
-2. Defining display environment.
-**This part influences how the study subject views the display. We use [equirectangular](https://bonvision.github.io/pages/02-Display-Environment-basics/#2d-stimuli) to map the 3D sphere on the window. Because of this mapping, a 2-degree dot will look more or less similar from the observer's viewpoint, no matter where the dot is drawn on the window.<br />
+2. **Defining display environment**
+This part influences how the study subject views the display. We use [equirectangular](https://bonvision.github.io/pages/02-Display-Environment-basics/#2d-stimuli) to map the 3D sphere on the window (2D display). Because of this mapping, a 2-degree dot will look more or less similar from the observer's viewpoint, no matter where the dot is drawn on the window. Note: when presenting full-field visual stimuli with an equirectangular projection, the distortion at higher elevations prevents the rendered environment from covering the entire display. You keep the rendered window like this, or enlarge your rendering window to fit the display. Both methods has its caveats and benefits. For those who cares about distortation, equirectangular projection is not your choices when presenting stimuli at high elevation. <br />
 <br /> The Groupworkflow, LED_sphere_mapping, was optimized to present stimuli to 4 subjects; each subject is surrounded by 4 LED screens, so there are quadruplicates of nodes in the group workflow.
 
 **Nodes to change**:<br />
-**ViewWindow** - This [node](https://bonvision.github.io/docs/ViewingWindow/#) defines the physical location of your display is relative to the observer (both translational and rotational in the 3D space) It is hard to describe what value you should put in the XYZ as it depends on the relative position between the observer and the display. In our case, we appointed the front screen to be the reference screen so setting is values along rotational axes all equal 0. In terms of Translational displacement, Z represents the distance vector from the screen to the observer, so -12.5 means the screen is in front of the subject by 12.5 cm. Y represents levels between observer's viewpoint and the centre of the screen, so 0 means the centre of the screen and the subject's viewpoint is at the same level the subject. Following this order, the left screen was rotated by 90 degree and positioned on the left side of the subject by 12.5 cm.<br />
+*ViewWindow* - This [node](https://bonvision.github.io/docs/ViewingWindow/#) defines the physical location of your display is relative to the observer (both translational and rotational in the 3D space) It is hard to describe what value you should put in the XYZ as it depends on the relative position between the observer and the display. In our case, we appointed the front screen to be the reference screen so setting is values along rotational axes all equal 0. In terms of Translational displacement, Z represents the distance vector from the screen to the observer, so -12.5 means the screen is in front of the subject by 12.5 cm. Y represents levels between observer's viewpoint and the centre of the screen, so 0 means the centre of the screen and the subject's viewpoint is at the same level the subject. Following this order, the left screen was rotated by 90 degree and positioned on the left side of the subject by 12.5 cm.<br />
 <img width="828" height="347" alt="Screenshot 2026-10-28 233618" src="https://github.com/user-attachments/assets/30ed6e7d-e60a-43f9-b308-d00bad187e11" /><br />
-**DrawViewport** - This [node](https://bonvision.github.io/docs/DrawViewport/#) defines the size and location of your display in your drawing window. If your drawing window was mapped onto 4 displays, then assign the following values to each one of the displays 0.25, 0.5, 0.75, 1.0. Whether these values go into X or Y axis depends on which orientation the displays are aligned (X means horizontal stack; Y means vertical stack). In this workflow, we stack LED panels horizontally, starting from the left screen. However, there is no fixed rule about this. As long as the rotational direction follow a sequence. <br />
+*DrawViewport* - This [node](https://bonvision.github.io/docs/DrawViewport/#) defines the size and location of your display in your drawing window. If your drawing window was mapped onto 4 displays, then assign the following values to each one of the displays 0.25, 0.5, 0.75, 1.0. Whether these values go into X or Y axis depends on which orientation the displays are aligned (X means horizontal stack; Y means vertical stack). In this workflow, we stack LED panels horizontally, starting from the left screen. However, there is no fixed rule about this. As long as the rotational direction follow a sequence. <br />
 <img width="1106" height="336" alt="Screenshot 2026-10-25 225134" src="https://github.com/user-attachments/assets/8b7a1813-8c05-438f-942e-4d4811b66515" /><br />
 
-3. Stimulus workflow
+3. **Stimulus workflow**
+This part generates stimuli of interest. In this workflow, we used customized codes to generate many dots. The metadata about those dots is stored in a CSV file in the main workflow. A typical way to generate stimulus sequence on Bonsai is to first define the length of a stimulus and its interval. Then use *TakeUntil* node connected by a *Timer* to control when to stop presenting stimuli. Once the stimulus disappears, use *Delay* to prolong time of presenting the empty screen. More details can be found [here](https://bonvision.github.io/pages/03-Creating-Basic-Stimuli/#troubleshooting). However, in RDK, the control condition is not an empty screen but moving dots at 0%. Therefore, we designed two streams, one presenting interstimulus intervals and the other presenting stimulus presentation, and then we use the node *Concat* to present them in [sequence](https://bonvision.github.io/pages/04-Series-of-stimuli/).<br />
+<img width="1167" height="402" alt="Screenshot 2026-10-29 121911" src="https://github.com/user-attachments/assets/bc25086c-12ff-4c00-9cb0-82ec55f270e4" /><br />
+**Nodes to change**:<br />
+*Timer* Duration for the grey screen before presenting any stimuli (no matter it is stimulus or inter-stimulus interval).<br />
+*RepeatCount*: how many repetitions do you want to have in this sequence?<br />
+Note: I have exposed these two parameters in the main workflow so you can also find them there.
+*MotionCoherenceSpecification*: this node is inside the note *4coherence_2directions* and *interval_2length*<br />
+<img width="860" height="158" alt="Screenshot 2026-10-29 123544" src="https://github.com/user-attachments/assets/08fc173f-9520-44eb-a8b4-657edfd1b70c" /><br />
+Once you click on the three dots on the side, this editor window will pop up. Here you can specify parameters in the RDK. Note: at most, you can generate two motion flow simultaneously. The first one has a suffix 1 in all of its properties. The second one has a suffix 2.<br />
+<img width="470" height="457" alt="Screenshot 2026-10-29 123811" src="https://github.com/user-attachments/assets/abbcf31f-778b-4024-82f7-4417e2fee071" /><br />
 
-
-4. Filming workflow
+5. **Filming workflow**
 
 
