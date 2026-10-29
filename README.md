@@ -1,18 +1,24 @@
 # BonVision random dot kinematogram
 ## Introduction
-This is a repository storing a workflow to present random dot kinematogram with [BonVision](https://bonvision.github.io/) package in [Bonsai](https://bonsai-rx.org/).
+This is a repository storing a workflow to present a random dot kinematogram with [BonVision](https://bonvision.github.io/) package in [Bonsai](https://bonsai-rx.org/).
 
-A random dot kinematogram is a motion‑perception protocol consisting of circular dots moving in the whole field. Some of the dots move coherently in one direction (signal) while others move randomly (noise).
+A random dot kinematogram is a motion‑perception protocol in which circular dots move across the entire field. Some dots move coherently in one direction (signal), while others move randomly (noise).
 
-Bonsai is a graphical, event-based language. Its capacity to interact with various types of external hardware in real time, makes it a promising tool in neuroscience. BonVision is a package built up top of that to present visual stimuli across different display and render configurations.
+Bonsai is a graphical, event-based language. Its capacity to interact with various types of external hardware in real time makes it a promising tool in neuroscience. BonVision is a package built on top of that to present visual stimuli across different display and rendering configurations.
 
-To generate many moving dots in the scene, it would be more efficient to write extension codes than to build workflow in Bonsai GUI.
+To generate many moving dots in the scene, it would be more efficient to write extension code than to build a workflow in the Bonsai GUI.
 
-This [tutorial](https://bonsai-rx.org/docs/tutorials/scripting.html) introduces how to write such a extension code that can be used to generate moving dots.
+This [tutorial](https://bonsai-rx.org/docs/tutorials/scripting.html) introduces how to write such an extension code that can be used to generate moving dots.
 
-Visual stimuli generated with BonVision package are optimised to one viewing point (for rendering stimuli at a specific size, orientation and location,), so the extension files and the example workflow in this workflow can be applicable to different animal species. As long as they are constrained at a location to receive visual stimuli.
+Visual stimuli generated with the BonVision package are optimized for one viewing point (for rendering stimuli at a specific size, orientation, and location), so the extension files and the example workflow in this workflow can be applicable to different animal species. As long as they are constrained at a location to receive visual stimuli.
 
-In the associated article and database, this example workflow is used to present random dot kinematograms to tethered desert locust.
+In the associated article and database, this example workflow presents random dot kinematograms to tethered desert locusts.
+See the following video as an example. The video is sped up 2.0x 
+
+
+https://github.com/user-attachments/assets/823a4b4c-9182-4d24-8816-ab129320d2df
+
+
 
 ## Start to use the repository
 1. The best way to use codes in this github repository is to install [Git](https://git-scm.com/) and then clone this repository to your local device.
