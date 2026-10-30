@@ -1,7 +1,7 @@
 # BonVision random dot kinematogram
 ## Introduction
 <img width="312" height="131" alt="bonsai_bonvision" src="https://github.com/user-attachments/assets/c760b664-ac1f-4ada-bf24-b14f22d188e4" /><br />
-This is a repository storing a workflow to present a random dot kinematogram with [BonVision](https://bonvision.github.io/) package in [Bonsai](https://bonsai-rx.org/).
+This is a repository storing a workflow to present random dot kinematograms with [BonVision](https://bonvision.github.io/) package in [Bonsai](https://bonsai-rx.org/).
 
 A random dot kinematogram is a motion‑perception protocol in which circular dots move across the entire field. Some dots move coherently in one direction (signal), while others move randomly (noise).
 
@@ -20,11 +20,13 @@ Click the following links to view an example video if it does not pop up automat
 https://github.com/user-attachments/assets/823a4b4c-9182-4d24-8816-ab129320d2df
 
 
-You can find the article and database on Zenodo: 10.5281/zenodo.23565813 
+You can find the article and the [dataset](https://doi.org/10.5281/zenodo.23565813) on Zenodo<br />
+
 ## Start to use the repository
 1. The best way to use codes in this github repository is to install [Git](https://git-scm.com/) and then clone this repository to your local device.
-Nevertheless, you can always click on the **<> Code** button on the top and select download as zip.
+Nevertheless, you can always click on the **<> Code** button on the top and select download as zip.<br />
 2. Then depending on whether you want to use the [stimulus code](https://github.com/chiyu1203/bonvision_rdk/tree/main/BonsaiWorkflows) or [analysis code](https://github.com/chiyu1203/bonvision_rdk/tree/main/Analysis), move to their respective folders for detailed explanations.
 
-## Cite this work
-Use the DOI on Zenodo: 10.5281/zenodo.23565813 
+## How to cite this work
+On the Zenodo, you can export the citation file about this [dataset](https://doi.org/10.5281/zenodo.23565813), or if you would prefer to type down manually, see below:<br />
+Lee, C.-Y., Hachen, I., Kumar Kaushik, P., Horrocks, E., Chen, C.-J., & Couzin-Fuchs, E. (2026). Random Dot Kinematograms in Desert Locusts [Dataset]. Zenodo.
