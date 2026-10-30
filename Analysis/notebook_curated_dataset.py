@@ -35,14 +35,6 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ### Anyway, let us give it a try.
-    """)
-    return
-
-
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md(r"""
     ## Session 0: loading package depandancies and environmental variables
     """)
     return
@@ -58,7 +50,6 @@ def _():
     import matplotlib.pyplot as plt
     import seaborn as sns
     from utils import plot_yaw_angular_velocity, boolean_array_to_event_table, bootstrap_cumulative_probability, converting_follow_velocity, heatmap, annotate_heatmap
-    from reliability.Probability_plotting import Exponential_probability_plot
     from reliability.Fitters import Fit_Weibull_2P,Fit_Everything,Fit_Exponential_1P,Fit_Weibull_DS,Fit_Weibull_Mixture,Fit_Exponential_2P
         ## A useful function to generate a data list for further analysis
     from matplotlib.colors import ListedColormap
@@ -103,46 +94,6 @@ def _(json):
     with open(_file_name, 'r') as _f:
         analysis_methods = json.loads(_f.read())
     return (analysis_methods,)
-
-
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md(r"""
-    ### Session 0.2: Gaining access to the dataset
-    """)
-    return
-
-
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md(r"""
-    #### Session 0.2.1 we used a 3-party package zenodo_get to download data from Zenodo (skip this session if you have access to the server of AG Couzin-Fuchs)
-    """)
-    return
-
-
-@app.cell
-def _():
-    from zenodo_get import download
-
-    #"10.5281/zenodo.23565813" is the dataset ID on Zenodo
-
-    #type in where you want to download in output_dir
-
-    #specify either the full file name or some pattern of the file name to download the data you want in file_glob
-
-    # For example 
-
-    # to download the curated database, type "*.gzip"
-    # to download the raw database, type "*.zip"
-    # to download the metadata, type "*.xlsx"
-    # typing "*.pdf", will download both the protocol and manuscript, so I would recommend using the full name in this scenario
-
-    # Because the rest of the notebook is about using curated database, here is the code ot download that
-
-    files_local_location="/Users/chiyu_lee/Downloads"
-    download("10.5281/zenodo.23565813",output_dir=files_local_location,file_glob="*.gzip")
-    return (files_local_location,)
 
 
 @app.cell(hide_code=True)

@@ -74,7 +74,6 @@ def _():
         pd,
         plot_example_trajectory,
         plot_yaw_angular_velocity,
-        plt,
     )
 
 
@@ -93,40 +92,6 @@ def _(json):
     with open(_file_name, 'r') as _f:
         analysis_methods = json.loads(_f.read())
     return (analysis_methods,)
-
-
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md(r"""
-    ### Session 0.2: Gaining access to the dataset
-    """)
-    return
-
-
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md(r"""
-    #### Session 0.2.1 we used a 3-party package zenodo_get to download data from Zenodo (skip this session if you have access to the server of AG Couzin-Fuchs)
-    """)
-    return
-
-
-@app.cell
-def _():
-    from zenodo_get import download
-    # the raw dataset is huge so I would recommend you to prepar a 10GB space to your local hard drive. 
-
-    #"10.5281/zenodo.23565813" is the dataset ID on Zenodo
-
-    # specify either the full file name or some pattern of the file name to download the data you want in file_glob. For example:
-    ## to download the curated database, type "*.gzip"
-    ## to download the raw database, type "*.zip"
-    ## to download the metadata, type "*.xlsx"
-    ## typing "*.pdf", will download both the protocol and manuscript, so I would recommend using the full name in this scenario
-
-    files_local_location="/Users/chiyu_lee/Downloads"# change here to where you want to download the dataset
-    #download("10.5281/zenodo.23565813",output_dir=files_local_location,file_glob="*.zip")
-    return (files_local_location,)
 
 
 @app.cell(hide_code=True)
@@ -251,6 +216,63 @@ def _(
     yaw_angular_velocity,
 ):
     plot_example_trajectory(x_all,y_all,yaw_angular_velocity=yaw_angular_velocity,start_frame=411341,end_frame=420430,start_marker=[412857,416894],end_marker=[415381,419418],analysis_methods=analysis_methods)
+
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ## Session 4: studying visually-evoked responses
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ###Session 4.1: obtain the event timing
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    Session 4.1.1: load pixel values from the synchroisation file
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    Session 4.1.2: select thresholds to define the timing of each transition event (from onset to offset)
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ###Session 4.2: align data with event timing.
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ####Session 4.2.1: Use the timing of events from 4.1 seession
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ####Session 4.2.2: Use event timing curated database
+    """)
     return
 
 
@@ -264,7 +286,7 @@ def _(analysis_methods, df, end_frame, init_frame, plot_yaw_angular_velocity):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ##Session 5: Others in the dataset
+    ##Session 5: Other metrics to study
     """)
     return
 
@@ -272,23 +294,16 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ### Session 5.1: visualising travel distance in the dataset
+    ### Session 5.1: visualising animal's velocity
     """)
     return
 
 
-@app.cell
-def _(df, plt):
-    _fig, (_ax1,_ax2) = plt.subplots(nrows=1, ncols=2,figsize=(10, 5))
-    #use pandas's groupby to get a summarised dataframe for every animal.
-    df_aba = df.groupby('ID').agg(travel_distance=('travel_distance', 'mean'), travel_distance_isi=('travel_distance_isi', 'mean'), ID=('ID', 'first'))
-    #ax1 is on the left, which plots the distribution of every animal's travel distance
-    #ax2 is on the right, which plots the distribution of the travel distance in every trial
-    _ax1.hist(df_aba['travel_distance'])
-    _ax2.hist(df['travel_distance'], bins=100)
-    _ax2.axvline(x=10, ymin=0, ymax=1, color='red', ls='--')
-    #_fig.savefig("histogram_4coherence.svg")
-    _fig
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ### Session 5.2: calculating optomotor index
+    """)
     return
 
 

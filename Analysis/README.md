@@ -41,13 +41,14 @@ pip install reliability zenodo-get
 Then you are ready to go.<br />
 
 To run the marimo notebook, first ensure you have activate the virtual environment.
-Then type the following
+Then type the following 
 ```
 #to enter editor mode
-marimo edit notebook.py
+marimo edit notebook_raw_dataset.py
 #to enter web app view-only mode
-marimo run notebook.p
+marimo run notebook_raw_dataset.py
 ```
+Note: I would recommend to start from notebook_download_dataset.py, followed by notebook_raw_dataset.py and finally notebook_curated_dataset.py. But you can skip the notebook_download_dataset.py if you already have access to the dataset.
 
 ## How to set up an virtual environment in python with package manager tool uv
 Installing uv in your local devices
@@ -106,9 +107,13 @@ uv sync
 ```
 
 ```
-To run marimo notebook
+To run marimo notebook (Similar to the note for conda users, I would recommend to start from notebook_download_dataset.py, followed by notebook_raw_dataset.py and finally notebook_curated_dataset.py, but you can skip the notebook_download_dataset.py if you already have access to the dataset). 
 ```
-uv run marimo edit .\notebook_curated_dataset.py
+#similarly, there are two modes to choose from, so just run one of the commands
+#to enter editor mode
+uv run marimo edit .\notebook_download_dataset.py
+#to enter web app view-only mode
+uv run marimo run notebook_raw_dataset.py
 ```
 Here is how a marimo notebook look like
 <img width="828" height="673" alt="Screenshot 2026-10-30 at 14 46 05" src="https://github.com/user-attachments/assets/20fa3af8-4e0d-4dfb-9124-dea037457d87" />
