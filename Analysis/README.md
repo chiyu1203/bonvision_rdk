@@ -2,7 +2,10 @@
 While the stimulus code was made in Bonsai, the analysis codes were written in Python.
 They were tested under both Window 11 and MacOS, so as long as the coding environment is ready, the computer's operating system is not an issue.<br />
 
-Here we will go through how to set up the coding environment in python
+Here we will go through how to set up the coding environment in python, and then open [marimo](https://docs.marimo.io/) notebook to access the data.
+
+
+
 I have tested the following two package managers to manage virtual environments of python and install python packages.<br />
 
 ## How to set up an virtual environment in python with package manager tool conda
@@ -107,4 +110,7 @@ To run marimo notebook
 ```
 uv run marimo edit .\notebook_curated_dataset.py
 ```
-(useCtrl + C, to terminate an operating notebook)
+Here is how a marimo notebook look like
+<img width="828" height="673" alt="Screenshot 2026-10-30 at 14 46 05" src="https://github.com/user-attachments/assets/20fa3af8-4e0d-4dfb-9124-dea037457d87" />
+
+(use Ctrl + C, to terminate an operating notebook)
