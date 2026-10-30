@@ -15,9 +15,8 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    #### Marimo notebook is similar to jupyter notebook, where you can interact with codes cell by cell (or block by block). Nevertheless, the biggest difference between the two is that Marimo notebook can automatically synchronise the value of global variables to all of the activated cells. This helps demonstrate a database like this, because you do not need to remember which cell to activate and which one to skip, but it is tricky to prototype a script on Marimo.
-
-    #### A useful tip for new Marimo notebook users: get used to local variables and global variables
+    #### I hope you get familiar with Marimo notebook after using notebook_download_datase.py and notebook_raw_datase.py
+    #### Here is why I decided to give this new type of interactive notebook a try.
     """)
     return
 
@@ -25,9 +24,15 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    #### What is a local variable on Marimo notebook?
-    #### A variable whose name starts from an _, for example _file_name
-    #### When a local variable gets updated, it will only affect code within the same cell. By contrast, a global variable will affect the entire notebook. Therefore, it is impossible to define two global variables with the same name.
+    #### Because Marimo updates global variables, and re-execuate those codes all the time, it has made developing interactive data visiualiser, and even web app easier
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    #### In this notebook, we will load the curated dataset into the workspace, analyse the datasset and then visulise the result with marimo's API.
     """)
     return
 
@@ -49,7 +54,8 @@ def _():
     import pandas as pd
     import matplotlib.pyplot as plt
     import seaborn as sns
-    from utils import plot_yaw_angular_velocity, boolean_array_to_event_table, bootstrap_cumulative_probability, converting_follow_velocity, heatmap, annotate_heatmap
+    from utils import boolean_array_to_event_table, bootstrap_cumulative_probability, converting_follow_velocity,bfill
+    from plotting_utils import plot_example_trajectory, plot_yaw_angular_velocity, heatmap, annotate_heatmap
     from reliability.Fitters import Fit_Weibull_2P,Fit_Everything,Fit_Exponential_1P,Fit_Weibull_DS,Fit_Weibull_Mixture,Fit_Exponential_2P
         ## A useful function to generate a data list for further analysis
     from matplotlib.colors import ListedColormap
@@ -107,23 +113,18 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    Session 1.1 if you have access to the server of AG Couzin-Fuchs, specify the path to where the database is stored. If you download the data from Zenodo, having_server_access to False and then specify where you store the data in this_dataste_dir
+    Session 1.1 if you have access to the server of AG Couzin-Fuchs, specify the path to where the database is stored. Otherwises, rewrite the variable **this_dataset_dir** to where you saved the dataset in your computer.
     """)
     return
 
 
 @app.cell
-def _(Path, files_local_location, pd):
-    #The benefit of saving database in parquet.gzip is long-term storage but loading it takes time
-    having_server_access=True
+def _(Path, pd):
+    #The benefit of saving database in parquet.gzip is long-term storage but loading it takes time...
     _folder_name = 'MatrexVR'
     #_Datasets = 'Z:/DATA/experiment_trackball_Optomotor'
     _Datasets ='/Volumes/AG_Couzin-Fuchs/DATA/experiment_trackball_Optomotor/'
-    if having_server_access:
-        this_dataset_dir = f'{_Datasets}/{_folder_name}'
-    else:
-        this_dataset_dir = files_local_location
-    
+    this_dataset_dir = f'{_Datasets}/{_folder_name}'#change here if the dataset is on your computer
     _file_name = 'MatrexVR_4coherence_database_rolling_median.parquet.gzip'
     df = pd.read_parquet(Path(this_dataset_dir) / _file_name)
     return (df,)
@@ -147,6 +148,7 @@ def _(mo):
 
 @app.cell
 def _(analysis_methods):
+    #Depending on the how to set the analysis_window in the analysis method, this cell will return init_frame and end_frame. Thosse two represent the analysis window but in terms of frame count for the dataset
     _camera_fps=analysis_methods.get('camera_fps')
     analysis_window = analysis_methods.get('analysis_window')
     stim_duration = analysis_methods.get('stim_duration')
@@ -187,23 +189,58 @@ def _(mo):
     return
 
 
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ####Session 3.1.1: there is directionality in the angular velocity but since we saw loucsts tend to rotate the same direction as the stimulus, we combine trials where the stimuli were at the same coherence level but toward the opposite directions together.
+    """)
+    return
+
+
 @app.cell
 def _(converting_follow_velocity, df):
-    df_angular_speed=df.apply(converting_follow_velocity, axis=1)
-    return (df_angular_speed,)
+    # what this cell does is to convert the direction of angular velocity if the stimulus is going toward a -1 direction in the dataset
+    df_converted=df.apply(converting_follow_velocity, axis=1)
+    return (df_converted,)
 
 
 @app.cell
-def _(df_angular_speed, end_frame, init_frame):
+def _(df_converted, end_frame, init_frame):
+    # Then load the data into a temporary array, arr. Because in this curated dataset, the first 16 columns noting trial information and meta-data, we pick up data after the 16th column
     _num_trial_info_column=16
-    arr = df_angular_speed.iloc[:, init_frame+_num_trial_info_column:end_frame+_num_trial_info_column].values
+    arr = df_converted.iloc[:, init_frame+_num_trial_info_column:end_frame+_num_trial_info_column].values
     return (arr,)
 
 
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ### Session 3.2: A GUI to output fitting results with varying parameters
+    ####Session 3.1.2: Here is a function ready to calculate whether some angular velocity values at a certain coherence level pass the criteria of following dots.
+    """)
+    return
+
+
+@app.cell
+def _(boolean_array_to_event_table, camera_fps, np):
+    # just activate this function and we will use it later
+    def detecting_following_events(
+        _this_sample_size: int,_this_target_speed: float, _coherence_index: int,arr:np.ndarray, df):
+        timepoints = np.arange(arr.shape[1]) / camera_fps
+        coherence_levels=[0,33,66,100]
+        _coherence_to_analyse=coherence_levels[_coherence_index]
+        _hit_target_epochs = arr > _this_target_speed
+        _trial_to_analyse = abs(df['stim_type']) == _coherence_to_analyse
+        _this_data = _hit_target_epochs[df[_trial_to_analyse].index,]
+        _output_table, _ = boolean_array_to_event_table(_this_data, timepoints=timepoints, stimulus_onset=0, consecutive_samples=_this_sample_size)
+        return _output_table
+
+    return (detecting_following_events,)
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ### Session 3.2: A Marimo-based GUI to output fitting results with varying parameters
     """)
     return
 
@@ -226,13 +263,14 @@ def _(
     censored_data,
     model_choice,
 ):
-    def fit_model(input_data):
+    # you can add your model of interest here. Just remember to import the function from Reliability package.
+    def fit_model(following_events):
         output=[]
         if censored_data.value:
-            _faiures=input_data[input_data['event'] == 1]['time'].values
-            _right_censored=input_data[input_data['event'] == 0]['time'].values
+            _faiures=following_events[following_events['event'] == 1]['time'].values
+            _right_censored=following_events[following_events['event'] == 0]['time'].values
         else:
-            _faiures=input_data[input_data['event'] == 1]['time'].values
+            _faiures=following_events[following_events['event'] == 1]['time'].values
             _right_censored=None
         if model_choice.value=="All of the above":
             _1=Fit_Weibull_DS(failures=_faiures, right_censored=_right_censored, show_probability_plot=False)
@@ -255,22 +293,6 @@ def _(
             print("unidentified model")
 
     return (fit_model,)
-
-
-@app.cell
-def _(boolean_array_to_event_table, camera_fps, np):
-    def prepare_input(
-        _this_sample_size: int,_this_target_speed: float, _coherence_index: int,arr:np.ndarray, df):
-        timepoints = np.arange(arr.shape[1]) / camera_fps
-        coherence_levels=[0,33,66,100]
-        _coherence_to_analyse=coherence_levels[_coherence_index]
-        _hit_target_epochs = arr > _this_target_speed
-        _trial_to_analyse = abs(df['stim_type']) == _coherence_to_analyse
-        _this_data = _hit_target_epochs[df[_trial_to_analyse].index,]
-        _output_table, _ = boolean_array_to_event_table(_this_data, timepoints=timepoints, stimulus_onset=0, consecutive_samples=_this_sample_size)
-        return _output_table
-
-    return (prepare_input,)
 
 
 @app.cell
@@ -300,11 +322,11 @@ def _(mo):
 
 
 @app.cell
-def _(arr, df, fit_model, form, mo, prepare_input):
+def _(arr, detecting_following_events, df, fit_model, form, mo):
     mo.stop(form.value is None, mo.md("Click **Go, Hidden Scientists!** to fit a model to the data and adjust the parameters with sliders "))
     _v = form.value
-    input_data = prepare_input(_v["sample_size"], _v["speed_thresholds"], _v["coherence_levels"],arr,df)
-    fit_model(input_data)
+    following_events = detecting_following_events(_v["sample_size"], _v["speed_thresholds"], _v["coherence_levels"],arr,df)
+    fit_model(following_events)
     return
 
 

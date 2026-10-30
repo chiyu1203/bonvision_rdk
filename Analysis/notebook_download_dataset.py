@@ -50,50 +50,30 @@ def _(mo):
 
 @app.cell
 def _():
-    import os,json
-    from pathlib import Path
     import marimo as mo
-    import numpy as np
-    import pandas as pd
-    from zenodo_get import download
+    from pathlib import Path
+
+    return (mo,)
 
 
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ### Session 0.1: Loading analysis methods into a dictionary variable
+    ### Session 1: Gaining access to the dataset
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    #### Session 1.1: we used a 3-party package zenodo_get to download data from Zenodo (skip this session if you have access to the server of AG Couzin-Fuchs)
     """)
     return
 
 
 @app.cell
-def _(json):
-    # I used python dict to manage how to analyse data. The dictionary is stored in .json file. These commands load json file as a python dictionary
-    _file_name = './analysis_methods_dictionary.json'
-    with open(_file_name, 'r') as _f:
-        analysis_methods = json.loads(_f.read())
-    return (analysis_methods,)
-
-
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md(r"""
-    ### Session 0.2: Gaining access to the dataset
-    """)
-    return
-
-
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md(r"""
-    #### Session 0.2.1 we used a 3-party package zenodo_get to download data from Zenodo (skip this session if you have access to the server of AG Couzin-Fuchs)
-    """)
-    return
-
-
-@app.cell
-def _():
-
+def _(download):
     # the raw dataset is huge so I would recommend you to prepar a 10GB space to your local hard drive. 
 
     #"10.5281/zenodo.23565813" is the dataset ID on Zenodo
@@ -105,9 +85,8 @@ def _():
     ## typing "*.pdf", will download both the protocol and manuscript, so I would recommend using the full name in this scenario
 
     files_local_location="/Users/chiyu_lee/Downloads"# change here to where you want to download the dataset
-    #download("10.5281/zenodo.23565813",output_dir=files_local_location,file_glob="*.zip")# to download raw dataset
-
-    return (files_local_location,)
+    download("10.5281/zenodo.23565813",output_dir=files_local_location,file_glob="*.zip")
+    return
 
 
 if __name__ == "__main__":

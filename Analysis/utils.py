@@ -270,3 +270,82 @@ def bootstrap_cumulative_probability(
         rng=np.random.default_rng(seed),
     )
     return probability, result.confidence_interval.low, result.confidence_interval.high
+def sorting_trial_info(stim_info, analysis_methods,exp_date="XXXXXX"):
+    #error related to cannot reshape array of size 1624 into shape (57,newaxis) is usually because the temperature is logged in the next row in the trial file
+    #errpr related ValueError: Unable to parse string " " at position 0 is usually because the temperature is not logged in the current row in the trial file
+    visual_paradigm_name = analysis_methods.get("experiment_name")
+    exp_place = analysis_methods.get("exp_place")
+    camera_fps=analysis_methods.get("camera_fps")
+    pre_stim_interval = analysis_methods.get("prestim_duration")
+    stim_info = stim_info.reset_index()
+    if type(stim_info.iloc[0,0])==str:### this still has bug because in the session Y:\GN26041\260411\looming\session1\2026-04-11_17-22-53, first frame time is 89.14 sec based on stim_info.iloc[0,0] but it will be 62 sec based on stim_info.iloc[0,1]
+        first_event_time=stim_info.iloc[0,1]/camera_fps
+    else:
+        first_event_time=stim_info.iloc[0,0]/camera_fps
+    update_pre_stim_interval=False
+    if first_event_time>pre_stim_interval and update_pre_stim_interval:
+        analysis_methods.update({"prestim_duration":first_event_time})
+    raw_column_number = stim_info.shape[1]
+    col_index = [2, 3, 4, 5, 7, 11, 13, 15, 17]
+    col_name = [
+        "ID",
+        "Duration",
+        "Size",
+        "Colour",
+        "numDots",
+        "Contrast",
+        "VelX",
+        "VelY",
+        "Coherence",
+    ]
+    for i, j in zip(col_index, col_name):
+        stim_info[["tmp", j]] = stim_info.iloc[:, i].str.split("=", expand=True)
+        stim_info[j] = pd.to_numeric(stim_info[j])
+    if exp_place.lower() == "zball" or exp_place.lower() == "matrexvr":
+        if stim_info['Timestamp'].dtypes=='float64':
+            stim_info["ts"]=stim_info['Timestamp']
+            stim_info['temperature']=pd.to_numeric(stim_info["Value"].str.replace(r"[()]", "", regex=True).str.split(";",expand=True)[0])
+            stim_info['humidity']=pd.to_numeric(stim_info["Value"].str.replace(r"[()]", "", regex=True).str.split(";",expand=True)[1])
+            stim_info["temperature"] = stim_info["temperature"].astype("float32")
+            stim_info["humidity"] = stim_info["humidity"].astype("float32")
+        else:
+            stim_info["ts"] = stim_info["Value"].str.replace(r"[()]", "", regex=True)
+    elif exp_place.lower() == "vccball":
+        stim_info["Value"] = stim_info["Value"].str.replace(r"[()]", "", regex=True)
+        if stim_info["Timestamp"].dtypes == "object":
+            stim_info["Timestamp"] = stim_info["Timestamp"].str.replace(
+                r"[()]", "", regex=True
+            )
+        stim_info["Value"] = stim_info["Value"].fillna(0)
+        stim_info["Timestamp"] = stim_info["Timestamp"].astype(str)
+        stim_info["Value"] = stim_info["Value"].astype(str)
+        stim_info["ts"] = stim_info[["Timestamp", "Value"]].agg(".".join, axis=1)
+    stim_info["ts"] = pd.to_numeric(stim_info["ts"])
+    stim_info["ts"] = stim_info["ts"].astype("float32")
+    stim_info.drop(
+        columns=stim_info.columns[0 : raw_column_number + 1], inplace=True
+    )
+    if visual_paradigm_name.endswith("sities") or visual_paradigm_name=="density":
+        if stim_info["VelX"].unique()[0]==0:
+            stim_variable_with_direction = (
+                stim_info["VelY"] * stim_info["numDots"] / abs(stim_info["VelY"])
+            )
+        elif stim_info["VelY"].unique()[0]==0:
+            stim_variable_with_direction = (
+                stim_info["VelX"] * stim_info["numDots"] / abs(stim_info["VelX"])
+            )
+    elif visual_paradigm_name.lower() == "coherence":
+        stim_variable_with_direction = (
+            (stim_info["VelY"]+stim_info["VelX"]) * stim_info["Coherence"] / (abs(stim_info["VelY"])+abs(stim_info["VelX"]))
+        )## needs to calculate the direction in this way is because due to some random setup, I made VelY to be the velocity during inter-stimulus interval (VelX to be 0). Vice versa for stimulus presentation.
+        ## hence, there is no unique stim_info["VelX"].unique()[0]==0 in this protocol.
+    
+    if exp_place.lower() == "vccball":
+        stim_info["stim_type"] = -1* stim_variable_with_direction.astype(int)
+    else:
+        stim_info["stim_type"] = stim_variable_with_direction.astype(int)
+        # needs to add multiple by -1 because in VCC balls positive value means dots moves from right to left in a window (or counterclock-wise from the top-down view)
+        # this is opposite from the parameters at zball. This is because the display environment (ViewWindow nodes were set differently)
+        ## from now on, positive value means horizontal degree increment, a clockwise motion in panoroma setup
+    stim_type = np.sort(stim_info.stim_type.unique()).tolist()
+    return stim_info, stim_type

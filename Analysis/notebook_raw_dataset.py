@@ -35,14 +35,6 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ### Anyway, let us give it a try.
-    """)
-    return
-
-
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md(r"""
     ## Session 0: loading package depandancies and environmental variables
     """)
     return
@@ -57,7 +49,7 @@ def _():
     import pandas as pd
     import matplotlib.pyplot as plt
     import seaborn as sns
-    from utils import boolean_array_to_event_table, bootstrap_cumulative_probability, converting_follow_velocity,bfill
+    from utils import boolean_array_to_event_table, bootstrap_cumulative_probability, converting_follow_velocity,bfill,sorting_trial_info
     from plotting_utils import plot_example_trajectory, plot_yaw_angular_velocity, heatmap, annotate_heatmap
 
     from matplotlib.colors import ListedColormap
@@ -74,6 +66,7 @@ def _():
         pd,
         plot_example_trajectory,
         plot_yaw_angular_velocity,
+        sorting_trial_info,
     )
 
 
@@ -105,27 +98,25 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    Session 1.1 if you have access to the server of AG Couzin-Fuchs, specify the path to where the database is stored. If you download the data from Zenodo, having_server_access to False and then specify where you store the data in this_dataste_dir
+    Session 1.1 if you have access to the server of AG Couzin-Fuchs, specify the path to where the database is stored. Otherwises, rewrite the variable **this_dataset_dir** to where you saved the dataset in your computer.
     """)
     return
 
 
 @app.cell
-def _(Path, files_local_location, pd):
-    #The raw data following a hierarchical structure where each animal's data is stored in its own folder so here is an example to work on one of the folder.
-    having_server_access=True
+def _(Path, pd):
+    #The raw data following a hierarchical structure where each animal's data is stored in its own folder. Here is an example (LocustID: GN24098).
     _folder_name = 'MatrexVR'
     #_Datasets = 'Z:/DATA/experiment_trackball_Optomotor'
     _Datasets ='/Volumes/AG_Couzin-Fuchs/DATA/experiment_trackball_Optomotor/'
-    _animal_ID='GN24098'
-    _experiment_date='240810'
+    this_dataset_dir = f'{_Datasets}/{_folder_name}'#change here if the dataset is on your computer
+    animal_ID='GN24098'
+    experiment_date='240810'
     _file_name = 'database_camera2_2024-08-10T17_38_24-20240810_231205.parquet.gzip'
-    if having_server_access:
-        this_dataset_dir = f'{_Datasets}/{_folder_name}'
-    else:
-        this_dataset_dir = files_local_location
-    df = pd.read_parquet(Path(this_dataset_dir) / _animal_ID / _experiment_date / 'coherence'/ 'session1'/_file_name)
-    return (df,)
+
+    #Once the path of the file is specified, load the data into a pandas dataframe
+    df = pd.read_parquet(Path(this_dataset_dir) / animal_ID / experiment_date / 'coherence'/ 'session1'/_file_name)
+    return animal_ID, df, experiment_date, this_dataset_dir
 
 
 @app.cell(hide_code=True)
@@ -216,7 +207,7 @@ def _(
     yaw_angular_velocity,
 ):
     plot_example_trajectory(x_all,y_all,yaw_angular_velocity=yaw_angular_velocity,start_frame=411341,end_frame=420430,start_marker=[412857,416894],end_marker=[415381,419418],analysis_methods=analysis_methods)
-
+    #The output here is the figure 1B and 1C in Lee et al., 2026 
     return
 
 
@@ -231,7 +222,7 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ###Session 4.1: obtain the event timing
+    ###Session 4.2: obtain the event timing
     """)
     return
 
@@ -239,7 +230,20 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    Session 4.1.1: load pixel values from the synchroisation file
+    ####Session 4.2.1: load pixel values from the synchroisation file
+    """)
+    return
+
+
+@app.cell
+def _():
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ####Session 4.2.2: select thresholds to define the timing of each transition event (from onset to offset)
     """)
     return
 
@@ -247,7 +251,7 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    Session 4.1.2: select thresholds to define the timing of each transition event (from onset to offset)
+    ###Session 4.3: align data with event timing.
     """)
     return
 
@@ -255,7 +259,7 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ###Session 4.2: align data with event timing.
+    ####Session 4.3.1: Use the timing of events from 4.1 session
     """)
     return
 
@@ -263,7 +267,7 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ####Session 4.2.1: Use the timing of events from 4.1 seession
+    ####Session 4.3.2: Use event timing from the curated database
     """)
     return
 
@@ -271,8 +275,50 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ####Session 4.2.2: Use event timing curated database
+    ###Session 4.1: obtain trial information
     """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ####Session 4.1.1: load trial information from .csv file
+    """)
+    return
+
+
+@app.cell
+def _(
+    Path,
+    analysis_methods,
+    animal_ID,
+    experiment_date,
+    pd,
+    sorting_trial_info,
+    this_dataset_dir,
+):
+    _file_name='trial_events2024-08-10T17_38_17.csv'
+    _stim_info = pd.read_csv(Path(this_dataset_dir) / animal_ID / experiment_date / 'coherence'/ 'session1'/_file_name)
+    stim_info=sorting_trial_info(_stim_info, analysis_methods)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ####Session 4.1.2: Use trial information from the curated dataset
+    """)
+    return
+
+
+@app.cell
+def _(Path, pd, this_dataset_dir):
+    #define the path to curated dataset
+    _file_name = 'MatrexVR_4coherence_database.parquet.gzip'
+
+    ##define a new variable for a new path and replace this_data_dir with a new path if the curated dataset and raw dataset are not stored in the same place
+    curated_dataset_df = pd.read_parquet(Path(this_dataset_dir) / _file_name)
     return
 
 
