@@ -15,9 +15,9 @@ In this repository, visual stimuli are designed based on one viewing point (for 
 
 In the associated article and database, this example workflow presents random dot kinematograms to tethered desert locusts.
 
-See the following video as an example. The video is sped up 2.0x. <br />
+Click the following links to view an example video if it does not pop up automatically. The video is sped up 2.0x. <br />
 
-<video controls src="https://github.com/user-attachments/assets/823a4b4c-9182-4d24-8816-ab129320d2df" title="example video"></video>
+https://github.com/user-attachments/assets/823a4b4c-9182-4d24-8816-ab129320d2df
 
 
 You can find the article and database on Zenodo: 10.5281/zenodo.23565813 
