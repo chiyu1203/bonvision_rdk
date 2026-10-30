@@ -1,6 +1,6 @@
 # BonVision random dot kinematogram
 ## Introduction
-<img width="312" height="131" alt="bonsai_bonvision" src="https://github.com/user-attachments/assets/c760b664-ac1f-4ada-bf24-b14f22d188e4" />
+<img width="312" height="131" alt="bonsai_bonvision" src="https://github.com/user-attachments/assets/c760b664-ac1f-4ada-bf24-b14f22d188e4" /><br />
 This is a repository storing a workflow to present a random dot kinematogram with [BonVision](https://bonvision.github.io/) package in [Bonsai](https://bonsai-rx.org/).
 
 A random dot kinematogram is a motion‑perception protocol in which circular dots move across the entire field. Some dots move coherently in one direction (signal), while others move randomly (noise).
@@ -15,8 +15,10 @@ In this repository, visual stimuli are designed based on one viewing point (for 
 
 In the associated article and database, this example workflow presents random dot kinematograms to tethered desert locusts.
 
-See the following video as an example. The video is sped up 2.0x 
-https://github.com/user-attachments/assets/823a4b4c-9182-4d24-8816-ab129320d2df
+See the following video as an example. The video is sped up 2.0x. <br />
+
+<video controls src="https://github.com/user-attachments/assets/823a4b4c-9182-4d24-8816-ab129320d2df" title="example video"></video>
+
 
 You can find the article and database on Zenodo: 10.5281/zenodo.23565813 
 ## Start to use the repository
