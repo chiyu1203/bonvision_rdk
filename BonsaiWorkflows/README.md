@@ -1,4 +1,5 @@
-# How to use the rdk workflow in Bonsai?
+# How to use the rdk workflow in Bonsai?<br />
+## Note: there are ways to run Bonsai under [MacOS](https://github.com/orgs/bonsai-rx/discussions/2643) or [Linux](https://github.com/orgs/bonsai-rx/discussions/1101), but it needs some trial-and-error, so I would recommend to run it with BonVision under Windows.<br />
 ## Installation Bonsai
 1. Download the portable file (.zip) from the [webpage](https://bonsai-rx.org/docs/articles/installation.html)
 <br />
@@ -70,7 +71,7 @@ These nodes affect how the study subject views the display. We use [equirectangu
 <img width="1106" height="336" alt="Screenshot 2026-10-25 225134" src="https://github.com/user-attachments/assets/8b7a1813-8c05-438f-942e-4d4811b66515" /><br />
 
 3. **Stimulus workflow**<br />
-Inside this group workflow, these nodes generate stimuli of interest. In this workflow (the figure below), we used customized scripts to generate many dots. The metadata about those dots is stored in a CSV file in the main workflow. A typical way to generate a stimulus sequence on Bonsai is to first define the length of a stimulus and its interval. Then use *TakeUntil* node connected by a *Timer* to control when to stop presenting stimuli. Once the stimulus disappears, use *Delay* to prolong time of presenting the empty screen. More details can be found [here](https://bonvision.github.io/pages/03-Creating-Basic-Stimuli/#troubleshooting). However, in RDK, the control condition is not an empty screen but moving dots at 0%. Therefore, we designed two streams, one presenting interstimulus intervals and the other presenting stimulus presentation, and then we use the node *Concat* to present them in [sequence](https://bonvision.github.io/pages/04-Series-of-stimuli/).<br />
+Inside this group workflow, these nodes generate stimuli of interest. In this workflow (the figure below), we used customized scripts to generate many dots. The metadata about those dots is stored in a CSV file in the main workflow. A typical way to generate a stimulus sequence on Bonsai is to first define the length of a stimulus and its inter-stimulus interval (ISI). Then use *TakeUntil* node connected by a *Timer* to control when to stop presenting stimuli. Once the stimulus disappears, use *Delay* to prolong time of presenting the empty screen. More details can be found [here](https://bonvision.github.io/pages/03-Creating-Basic-Stimuli/#troubleshooting). However, in RDK, the control condition is not an empty screen but moving dots at 0%. Therefore, we designed two streams, one presenting interstimulus intervals and the other presenting stimulus presentation, and then we use the node *Concat* to present them in [sequence](https://bonvision.github.io/pages/04-Series-of-stimuli/).<br />
 <img width="1167" height="402" alt="Screenshot 2026-10-29 121911" src="https://github.com/user-attachments/assets/bc25086c-12ff-4c00-9cb0-82ec55f270e4" /><br />
 **Nodes to change**:<br />
 *Timer*: Duration for the grey screen before presenting any stimuli (no matter it is stimulus or inter-stimulus interval).<br />
@@ -98,4 +99,12 @@ This group workflow saves incoming acquisition frames as video files and their m
 
 <img width="646" height="331" alt="Screenshot 2026-10-29 143837" src="https://github.com/user-attachments/assets/a9405622-f2a3-46d9-93b9-e25b05aa9d76" />
 
-That is pretty much everything. Because the user base is smaller, there isn't much information online about coding in Bonsai, which also means existing chatbots cannot code it well. Coding in Bonsai can be frustrating (its reactive programming model differs from other languages). The GitHub page has an active [discussion forum](https://github.com/orgs/bonsai-rx/discussions)  where you can ask questions or look for templates. Once you get past the learning curve, this program will also help you think about how signal processing works in the brain.
+That is pretty much everything. 
+
+## To run this workflow
+
+Click on **Start** on the menu when your setup is ready. This workflow uses *Keydown* buttons **S** and **R** to start the stimulus sequence and recording respectively. The workflow will keep running after the entire stimulus sequence ends so remember to stop the workflow manually (because the 10-second ISI and 15-second ISI appear randomly in the sequence by design, there is not way to predict the exact timing when the workflow will run out of the stimulus sequence) 
+
+
+
+Because the user base is smaller, there isn't much information online about coding in Bonsai, which also means existing chatbots cannot code it well. Coding in Bonsai can be frustrating (its reactive programming model differs from other languages). The GitHub page has an active [discussion forum](https://github.com/orgs/bonsai-rx/discussions)  where you can ask questions or look for templates. Once you get past the learning curve, this program will also help you think about how signal processing works in the brain.
