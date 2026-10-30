@@ -15,9 +15,9 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ### Marimo notebook is similar to jupyter notebook, where you can interact with codes cell by cell (or block by block). Nevertheless, the biggest difference between the two is that Marimo notebook can automatically synchronise the value of global variables to all of the activated cells. This helps demonstrate a database like this, because you do not need to remember which cell to activate and which one to skip, but it is tricky to prototype a script on Marimo.
+    #### Marimo notebook is similar to jupyter notebook, where you can interact with codes cell by cell (or block by block). Nevertheless, the biggest difference between the two is that Marimo notebook can automatically synchronise the value of global variables to all of the activated cells. This helps demonstrate a database like this, because you do not need to remember which cell to activate and which one to skip, but it is tricky to prototype a script on Marimo.
 
-    ### A useful tip for new Marimo notebook users: get used to local variables and global variables
+    #### A useful tip for new Marimo notebook users: get used to local variables and global variables
     """)
     return
 
@@ -25,9 +25,9 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ### What is a local variable on Marimo notebook?
-    ### A variable whose name starts from an _, for example _file_name
-    ### When a local variable gets updated, it will only affect code within the same cell. By contrast, a global variable will affect the entire notebook. Therefore, it is impossible to define two global variables with the same name.
+    #### What is a local variable on Marimo notebook?
+    #### A variable whose name starts from an _, for example _file_name
+    #### When a local variable gets updated, it will only affect code within the same cell. By contrast, a global variable will affect the entire notebook. Therefore, it is impossible to define two global variables with the same name.
     """)
     return
 
@@ -50,8 +50,6 @@ def _(mo):
 
 @app.cell
 def _():
-    ## A useful function to generate a data list for further analysis
-
     import os,json
     from pathlib import Path
     import marimo as mo
@@ -60,11 +58,9 @@ def _():
     import matplotlib.pyplot as plt
     import seaborn as sns
     from utils import plot_yaw_angular_velocity, boolean_array_to_event_table, bootstrap_cumulative_probability, converting_follow_velocity, heatmap, annotate_heatmap
-    #from analyse_stimulus_evoked_response import plot_yaw_angular_velocity
-    #from stimulus_gated_weibull import boolean_array_to_event_table
-    #from cumulative_probability_bootstrap import bootstrap_cumulative_probability
     from reliability.Probability_plotting import Exponential_probability_plot
     from reliability.Fitters import Fit_Weibull_2P,Fit_Everything,Fit_Exponential_1P,Fit_Weibull_DS,Fit_Weibull_Mixture,Fit_Exponential_2P
+        ## A useful function to generate a data list for further analysis
     from matplotlib.colors import ListedColormap
     custom_5 = ListedColormap(
         ["blue","cyan","red","magenta", "purple"],
@@ -102,7 +98,7 @@ def _(mo):
 
 @app.cell
 def _(json):
-    # I used python dict to 
+    # I used python dict to manage how to analyse data. The dictionary is stored in .json file. These commands load json file as a python dictionary
     _file_name = './analysis_methods_dictionary.json'
     with open(_file_name, 'r') as _f:
         analysis_methods = json.loads(_f.read())
