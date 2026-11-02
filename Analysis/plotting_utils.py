@@ -116,9 +116,11 @@ def plot_yaw_angular_velocity(df,analysis_methods,init_frame=1000,end_frame=3500
     stim_duration=analysis_methods.get("stim_duration")
     if vr_no=='single':
         ylim_w=(-3,3)
+        num_resamples=99
         
     else:
         ylim_w=(-1.2,1.2)
+        num_resamples=999
     ylim_heading=(-150,150)
     using_bs_ci=True
     use_mean=False
@@ -214,10 +216,10 @@ def plot_yaw_angular_velocity(df,analysis_methods,init_frame=1000,end_frame=3500
         if using_bs_ci:
             confidence_level = 0.95
             #data=(these_angular_velocity,)
-            res=st.bootstrap(data=(these_headings,),statistic=np.median,n_resamples=999,vectorized=True,batch=100,random_state=1)
+            res=st.bootstrap(data=(these_headings,),statistic=np.median,n_resamples=num_resamples,vectorized=True,batch=100,random_state=1)
             y1=res.confidence_interval[0]
             y2=res.confidence_interval[1]
-            res=st.bootstrap(data=(these_angular_velocity,),statistic=np.median,n_resamples=999,vectorized=True,batch=100,random_state=1)
+            res=st.bootstrap(data=(these_angular_velocity,),statistic=np.median,n_resamples=num_resamples,vectorized=True,batch=100,random_state=1)
             w_y1=res.confidence_interval[0]
             w_y2=res.confidence_interval[1]
             ##to plot distribution with 95% confidence interval with normal distribution because it is faster not because it is correct

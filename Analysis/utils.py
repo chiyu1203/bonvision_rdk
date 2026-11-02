@@ -3,6 +3,20 @@ from typing import Optional, Sequence
 import numpy as np
 import pandas as pd
 import scipy.stats as st
+
+def generate_index_points(stim_to_analyse, analysis_window, camera_fps):
+    window_length = analysis_window[1] - analysis_window[0]
+    interval_onset = (
+        stim_to_analyse
+        + np.ones(len(stim_to_analyse), dtype=int) * analysis_window[0] * camera_fps
+    )
+    analysie_window_tile = np.tile(
+        np.arange(window_length * camera_fps), (len(interval_onset), 1)
+    )
+    index_points = (
+        np.array(interval_onset).reshape(len(interval_onset), 1) + analysie_window_tile
+    )
+    return index_points
 def ffill(arr):
     mask = np.isnan(arr)
     if arr.ndim == 1:
