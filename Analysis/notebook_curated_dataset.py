@@ -125,7 +125,7 @@ def _(Path, pd):
     #_Datasets = 'Z:/DATA/experiment_trackball_Optomotor'
     _Datasets ='/Volumes/AG_Couzin-Fuchs/DATA/experiment_trackball_Optomotor/'
     this_dataset_dir = f'{_Datasets}/{_folder_name}'#change here if the dataset is on your computer
-    _file_name = 'MatrexVR_4coherence_database_rolling_median.parquet.gzip'
+    _file_name = 'MatrexVR_4coherence_database.parquet.gzip'
     df = pd.read_parquet(Path(this_dataset_dir) / _file_name)
     return (df,)
 
@@ -149,12 +149,12 @@ def _(mo):
 @app.cell
 def _(analysis_methods):
     #Depending on the how to set the analysis_window in the analysis method, this cell will return init_frame and end_frame. Thosse two represent the analysis window but in terms of frame count for the dataset
-    _camera_fps=analysis_methods.get('camera_fps')
+    camera_fps=analysis_methods.get('camera_fps')
     analysis_window = analysis_methods.get('analysis_window')
     stim_duration = analysis_methods.get('stim_duration')
-    init_frame = _camera_fps * abs(analysis_window[0])
-    end_frame = _camera_fps * (abs(analysis_window[0]) + stim_duration)
-    return end_frame, init_frame, stim_duration
+    init_frame = camera_fps * abs(analysis_window[0])
+    end_frame = camera_fps * (abs(analysis_window[0]) + stim_duration)
+    return camera_fps, end_frame, init_frame, stim_duration
 
 
 @app.cell
@@ -300,7 +300,7 @@ def _(mo):
     form = mo.ui.form(
         mo.ui.dictionary({
             "sample_size": mo.ui.slider(start=1, stop=100,value=42,step=1,show_value=True),
-            "speed_thresholds": mo.ui.slider(start=0.1, stop=2, value=1,step=0.1,show_value=True),
+            "angular_speed_thresholds": mo.ui.slider(start=0.1, stop=2, value=1,step=0.1,show_value=True),
             "coherence_levels": mo.ui.slider(start=0, stop=3, value=1, step=1, show_value=True)},label="parameters"),
         submit_button_label="Go, Hidden Scientists!",
         bordered=False
@@ -325,7 +325,7 @@ def _(mo):
 def _(arr, detecting_following_events, df, fit_model, form, mo):
     mo.stop(form.value is None, mo.md("Click **Go, Hidden Scientists!** to fit a model to the data and adjust the parameters with sliders "))
     _v = form.value
-    following_events = detecting_following_events(_v["sample_size"], _v["speed_thresholds"], _v["coherence_levels"],arr,df)
+    following_events = detecting_following_events(_v["sample_size"], _v["angular_speed_thresholds"], _v["coherence_levels"],arr,df)
     fit_model(following_events)
     return
 
@@ -338,50 +338,72 @@ def _(mo):
     return
 
 
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    #### Session 3.3.1 plot following-dot event across different parameters
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    #### converting continuous variables such as 'velocity' into categorical variables (e.g. steering event) is not straightforward so I would prefer to sample different parameters and see if the same conclusion can be met
+    """)
+    return
+
+
 @app.cell
-def _(df, np):
+def _(arr, camera_fps, df, np):
     #parameter space to explore
-    coherence_levels=np.sort(abs(df['stim_type']).unique())
-    sample_sizes = np.arange(8, 101, 7)
-    _stimulus_speed = 64 * np.pi / 180
-    speed_thresholds = [round(0.5 * _stimulus_speed, 2), round(_stimulus_speed, 2), round(2 * _stimulus_speed, 2)]
-    return coherence_levels, sample_sizes, speed_thresholds
-
-
-@app.cell
-def _(analysis_methods, arr, np):
+    coherence_levels=np.sort(abs(df['stim_type']).unique())# Here are coherence level irrespective to moving direction
+    colours = ['y', 'c', 'm', 'k']# Here are colour name for each coherence level
+    sample_sizes = np.arange(8, 101, 7)# Here are the number for consecutive frame lengh
+    _stimulus_angular_speed = 64 * np.pi / 180 # Here is the angular velocity of the stimulus. 64 degree/s was the setting when designing this protocol
+    angular_speed_thresholds = [round(0.5 * _stimulus_angular_speed, 2), round(_stimulus_angular_speed, 2), round(2 * _stimulus_angular_speed, 2)]# Makes the threshold for angular speed, half of the stimulus angular speed, once stimulus angular speed, and twice stimulus angular speed
     onset_in_sec = 0
-    camera_fps = analysis_methods.get('camera_fps')
     timepoints = np.arange(arr.shape[1]) / camera_fps
     post_times = timepoints[timepoints > onset_in_sec] - onset_in_sec
-    return camera_fps, onset_in_sec, post_times, timepoints
+    post_times
+    return (
+        angular_speed_thresholds,
+        coherence_levels,
+        colours,
+        onset_in_sec,
+        post_times,
+        sample_sizes,
+        timepoints,
+    )
 
 
 @app.cell
 def _(
+    angular_speed_thresholds,
     arr,
     boolean_array_to_event_table,
     bootstrap_cumulative_probability,
     coherence_levels,
+    colours,
     df,
     onset_in_sec,
     plt,
     post_times,
     sample_sizes,
-    speed_thresholds,
     stim_duration,
     timepoints,
 ):
-    colours = ['y', 'c', 'm', 'k']
-    _use_single_threshold = True
-    if _use_single_threshold:
-        _stimulus_speed = speed_thresholds[1]
-        _hit_target_epochs = arr > _stimulus_speed
+    _pass_single_threshold = True# Here you can choose either use "passing the angular velocity threshold"  or the angular velocity falls within the range between two thresholds to define the angular velocity of interest
+    if _pass_single_threshold:
+        _stimulus_angular_speed = angular_speed_thresholds[1]#here to select which threshold to use out of the three parameters declaired in the previous cell. The default setting here is the 'once stimulus angular speed'
+        _hit_target_epochs = arr > _stimulus_angular_speed
     else:
-        _stimulus_speed = [speed_thresholds[0], speed_thresholds[2]]
-        _hit_target_lower = arr > _stimulus_speed[0]
-        _hit_target_higher = arr < _stimulus_speed[1]
+        _stimulus_angular_speed = [angular_speed_thresholds[0], angular_speed_thresholds[2]]#here to select a range where the angular velocity to fall in. The default setting here is from half of the stimulus angular speed to twice the angular velocity.
+        _hit_target_lower = arr > _stimulus_angular_speed[0]
+        _hit_target_higher = arr < _stimulus_angular_speed[1]
         _hit_target_epochs = _hit_target_higher & _hit_target_lower
+
+    # To visualise probability of success over time across the number of consectuve frame length (sample size) at different coherence levels. The following code loops over each parameter (j for n consecutive frame, i for coherence levels) and calculate how many events present in those trials.   
     _fig, _axes = plt.subplots(nrows=1, ncols=sample_sizes.shape[0], figsize=(24, 5), tight_layout=True, sharex=True, sharey=True)
     for _j, _this_sample_size in enumerate(sample_sizes):
         for _i, _this_coherence in enumerate(coherence_levels):
@@ -390,12 +412,10 @@ def _(
             _, _qualifying = boolean_array_to_event_table(_this_data, timepoints=timepoints, stimulus_onset=onset_in_sec, consecutive_samples=_this_sample_size)
             probability, lower, upper = bootstrap_cumulative_probability(_qualifying, n_resamples=99, confidence_level=0.95, seed=42, subject_ids=None)
             event_times = post_times[:_qualifying.shape[1]]
-            # _axes[_j].step(event_times, probability, where='post', color=colours[_i], label='Cumulative probability')
-            #_axes[_j].fill_between(event_times, lower, upper, step='post', color=colours[_i], alpha=0.25, label='95% pointwise bootstrap CI')
             _axes[_j].plot(event_times, probability, color=colours[_i], label=f"{_this_coherence}%")
             _axes[_j].fill_between(event_times, lower, upper,color=colours[_i], alpha=0.25)
             if _j==0:
-                _axes[_j].set(xlabel='Time since stimulus onset (s)', ylabel='Probability of Hit (%)', xticks=[onset_in_sec, stim_duration], ylim=(0, 1), yticks=[0, 0.5, 1], yticklabels=['0', '50', '100'])
+                _axes[_j].set(xlabel='time since stimulus onset (s)', ylabel='probability of success (%)', xticks=[onset_in_sec, stim_duration], ylim=(0, 1), yticks=[0, 0.5, 1], yticklabels=['0', '50', '100'])
     _fig
     return
 
@@ -403,7 +423,7 @@ def _(
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ##Session 4: Applying survival analysis/reliability engineering to steering events
+    ##Session 4: Applying time-to-event analysis to steering events
     """)
     return
 
@@ -411,7 +431,7 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ### Session4.1: Using Fit_everything function to compare the performance of each model.
+    ### Session4.1: Using Fit_everything function from Reliability package to compare the performance of each model.
     """)
     return
 
@@ -419,7 +439,7 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    #### The Fit_everything function can output parameter values, log-likelihood, AIC and BIC.
+    #### The Fit_everything function can output parameter values, log-likelihood, AIC and BIC, and make plots of fitting reulsts. But it can not output confidence intervals of the parameter
     """)
     return
 
@@ -427,6 +447,7 @@ def _(mo):
 @app.cell
 def _(
     Fit_Everything,
+    angular_speed_thresholds,
     arr,
     boolean_array_to_event_table,
     coherence_levels,
@@ -434,42 +455,58 @@ def _(
     np,
     onset_in_sec,
     sample_sizes,
-    speed_thresholds,
     timepoints,
 ):
-    _number_of_models=5
+    _model_available=['Normal_2P', 'Gumbel_2P', 'Lognormal_2P', 'Lognormal_3P', 'Loglogistic_2P', 'Loglogistic_3P', 'Gamma_2P', 'Gamma_3P', 'Weibull_CR', 'Weibull_3P', "Exponential_2P","Exponential_1P", "Weibull_2P","Weibull_Mixture","Weibull_DS"]# Here are the models available on Reliability version 0.90
+    _model_excluded=['Normal_2P', 'Gumbel_2P', 'Lognormal_2P', 'Lognormal_3P', 'Loglogistic_2P', 'Loglogistic_3P', 'Gamma_2P', 'Gamma_3P', 'Weibull_CR', 'Weibull_3P']# Write down model name which you do not want to include in the Fit_everything
+
+
+    ## Here is one way to store output values across parameters. I prefer to first declaring empty 3D matrex and then fill in those output values based on indexes along each axis
+    _number_of_models=len(_model_available)-len(_model_excluded)
     _coherence_to_analyse=coherence_levels[3]
-    ready_to_plot_AIC = np.ones((len(speed_thresholds), sample_sizes.shape[0], _number_of_models))
-    ready_to_plot_BIC = np.ones((len(speed_thresholds), sample_sizes.shape[0], _number_of_models))
-    for _i, _this_target_speed in enumerate(speed_thresholds):
+    ready_to_plot_AIC = np.zeros((len(angular_speed_thresholds), sample_sizes.shape[0], _number_of_models))
+    ready_to_plot_BIC = np.zeros((len(angular_speed_thresholds), sample_sizes.shape[0], _number_of_models))
+
+    ## Here to call the Fit_Everything function with varying parameters
+    for _i, _this_target_speed in enumerate(angular_speed_thresholds):
         _hit_target_epochs = arr > _this_target_speed
         for _j, _this_sample_size in enumerate(sample_sizes):
             _trial_to_analyse = abs(df['stim_type']) == _coherence_to_analyse
             _this_data = _hit_target_epochs[df[_trial_to_analyse].index,]
             _time_to_success_pd, _ = boolean_array_to_event_table(_this_data, timepoints=timepoints, stimulus_onset=onset_in_sec, consecutive_samples=_this_sample_size)
-            every = Fit_Everything(failures=_time_to_success_pd[_time_to_success_pd['event'] == 1]['time'].values, right_censored=_time_to_success_pd[_time_to_success_pd['event'] == 0]['time'].values, exclude=['Normal_2P', 'Gumbel_2P', 'Lognormal_2P', 'Lognormal_3P', 'Loglogistic_2P', 'Loglogistic_3P', 'Gamma_2P', 'Gamma_3P', 'Weibull_CR', 'Weibull_3P'], show_probability_plot=False, print_results=False, show_best_distribution_probability_plot=False, show_histogram_plot=False, show_PP_plot=False)
-            sorted_pd = every.results.sort_values('Distribution')
-            ready_to_plot_AIC[_i, _j, :] = sorted_pd['AICc'].values
-            ready_to_plot_BIC[_i, _j, :] = sorted_pd['BIC'].values
+            _results = Fit_Everything(failures=_time_to_success_pd[_time_to_success_pd['event'] == 1]['time'].values, right_censored=_time_to_success_pd[_time_to_success_pd['event'] == 0]['time'].values, exclude=_model_excluded, show_probability_plot=False, print_results=False, show_best_distribution_probability_plot=False, show_histogram_plot=False, show_PP_plot=False) ## Note, you can turn these plotting argument in the Fit_Everything function to True and see the fitting results.
+
+            _sorted_results = _results.results.sort_values('Distribution')# by default, the Fit_Everything function will sort the model based on which performance the best. This is however, not good for consistently storing output variables across parameters. Therefore, I sort the result based on the alphabetically order in the model name.
+            ready_to_plot_AIC[_i, _j, :] = _sorted_results['AICc'].values
+            ready_to_plot_BIC[_i, _j, :] = _sorted_results['BIC'].values
     return (ready_to_plot_AIC,)
 
 
 @app.cell
 def _(custom_5, np, plt, ready_to_plot_AIC, sample_sizes):
+    #Here to plot the resulting AIC. X-axis is AIC values, Y axis is sample size and each row is about the result from an angular velocity threshold
     _xlims = [(13000, 17500), (9500, 17000), (3000, 13500)]
     _yticks = [8, 50, 99]
     ix, iy, iz = np.indices(ready_to_plot_AIC.shape)
     _fig, _axes = plt.subplots(nrows=3, ncols=1, figsize=(30, 20), tight_layout=True, sharey=False)  #sharey='row'
     for _i in range(ready_to_plot_AIC.shape[0]):
-        _axes[_i].scatter(ready_to_plot_AIC[_i, :, :], np.transpose(np.tile(sample_sizes, (ready_to_plot_AIC.shape[2], 1))), s=40, c=iz[_i, :, :], cmap=custom_5, marker='^', alpha=1)
+        _axes[_i].scatter(ready_to_plot_AIC[_i, :, :], np.transpose(np.tile(sample_sizes, (ready_to_plot_AIC.shape[2], 1))), s=40, c=iz[_i, :, :], cmap=custom_5, marker='^', alpha=1)# change ready_to_plot_AIC to ready_to_plot_BIC if you want to see BIC
         _axes[_i].set_xlim(_xlims[_i])
         _axes[_i].set_xticks(_xlims[_i])
         _axes[_i].set_yticks(_yticks)
         for _label in _axes[_i].get_xticklabels():
-            _label.set_fontsize(20)  #axes[i].set_xscale('log')
+            _label.set_fontsize(20)
         for _label in _axes[_i].get_yticklabels():
             _label.set_fontsize(20)
     _fig
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ### Session4.2: Using Fit_XXXX functions from Reliability package to get detailed analysis of the model fit
+    """)
     return
 
 
@@ -485,6 +522,7 @@ def _(mo):
 def _(
     Fit_Weibull_2P,
     Fit_Weibull_DS,
+    angular_speed_thresholds,
     arr,
     boolean_array_to_event_table,
     coherence_levels,
@@ -492,15 +530,14 @@ def _(
     np,
     onset_in_sec,
     sample_sizes,
-    speed_thresholds,
     timepoints,
 ):
     _coherence_to_analyse=coherence_levels[3]
     _consider_censored_data=True
-    ready_to_plot_kappa = np.zeros((len(speed_thresholds), sample_sizes.shape[0]))
-    ready_to_plot_kappa_lower = np.zeros((len(speed_thresholds), sample_sizes.shape[0]))
-    ready_to_plot_kappa_upper = np.zeros((len(speed_thresholds), sample_sizes.shape[0]))
-    for _i, _this_target_speed in enumerate(speed_thresholds):
+    ready_to_plot_kappa = np.zeros((len(angular_speed_thresholds), sample_sizes.shape[0]))
+    ready_to_plot_kappa_lower = np.zeros((len(angular_speed_thresholds), sample_sizes.shape[0]))
+    ready_to_plot_kappa_upper = np.zeros((len(angular_speed_thresholds), sample_sizes.shape[0]))
+    for _i, _this_target_speed in enumerate(angular_speed_thresholds):
         _hit_target_epochs = arr > _this_target_speed
         for _j, _this_sample_size in enumerate(sample_sizes):
             _trial_to_analyse = abs(df['stim_type']) == _coherence_to_analyse
@@ -519,23 +556,23 @@ def _(
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ###Session 4.1: Using heatmap to visualise shape parameter
+    ###Session 4.3: Using heatmap to visualise shape parameter
     """)
     return
 
 
 @app.cell
 def _(
+    angular_speed_thresholds,
     annotate_heatmap,
     heatmap,
     ready_to_plot_kappa,
     sample_sizes,
-    speed_thresholds,
 ):
     #these two functions were adapted from https://matplotlib.org/3.1.0/gallery/images_contours_and_fields/image_annotated_heatmap.html
-    im, cbar = heatmap(ready_to_plot_kappa, list(map(str, speed_thresholds)), sample_sizes.astype(str).tolist())
-    texts = annotate_heatmap(im, valfmt='{x:.2f}', fontsize=8)
-    im
+    _im, _cbar = heatmap(ready_to_plot_kappa, list(map(str, angular_speed_thresholds)), sample_sizes.astype(str).tolist())
+    texts = annotate_heatmap(_im, valfmt='{x:.2f}', fontsize=8)
+    _im
     return
 
 
