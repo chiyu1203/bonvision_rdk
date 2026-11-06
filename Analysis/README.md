@@ -3,7 +3,9 @@ While the stimulus code was made in Bonsai, the analysis codes were written in P
 They were tested under both Window 11 and MacOS, so as long as the coding environment is ready, the computer's operating system is not an issue.<br />
 <br />
 Here we will go through how to set up the coding environment in python, and then open [marimo](https://docs.marimo.io/) notebook to access the data.<br />
-<br />
+
+https://github.com/user-attachments/assets/ecaac19f-9bb2-442c-8e09-be1a96f453c6
+
 Marimo notebook is similar to jupyter notebook, where you can interact with codes cell by cell (or block by block). Nevertheless, the biggest difference between the two is that Marimo notebook can automatically synchronise the value of global variables to all of the activated cells. This helps demonstrate a database like this, because you do not need to remember which cells to activate and which ones to skip. User feedback is updated automatically. However, jupyter notebook still has better support in other asepects but I found it trickier to prototype a script on Marimo (The promising thing is that Marimo has built up their APIs for users to convert notebooks from juypter notebook to Marimo notebook vice versa).
 
 #### A useful tip for new Marimo notebook users: get used to local variables and global variables
