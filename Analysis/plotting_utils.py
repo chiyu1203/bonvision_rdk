@@ -122,8 +122,8 @@ def plot_yaw_angular_velocity(df,analysis_methods,init_frame=1000,end_frame=3500
         ylim_w=(-1.2,1.2)
         num_resamples=999
     ylim_heading=(-150,150)
-    using_bs_ci=True
-    use_mean=False
+    using_bs_ci=True # if True, use bootstrap to calculate 95% confidence interval, if False, use sem to calculate 95% confidence interval
+    use_mean=False # if True, use mean to calculate the average response, if False, use median to calculate the median response
     stimulus_velocity=64 #unit degree/s
     walk_threshold_tbt=10
     premature_turn=0.25#set this criteria to remove animals starting to make turn turing ISI

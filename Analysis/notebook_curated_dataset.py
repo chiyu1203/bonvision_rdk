@@ -147,19 +147,23 @@ def _(mo):
 
 
 @app.cell
-def _(analysis_methods):
+def _(analysis_methods, np):
     #Depending on the how to set the analysis_window in the analysis method, this cell will return init_frame and end_frame. Thosse two represent the analysis window but in terms of frame count for the dataset
     camera_fps=analysis_methods.get('camera_fps')
     analysis_window = analysis_methods.get('analysis_window')
     stim_duration = analysis_methods.get('stim_duration')
     init_frame = camera_fps * abs(analysis_window[0])
     end_frame = camera_fps * (abs(analysis_window[0]) + stim_duration)
-    return camera_fps, end_frame, init_frame, stim_duration
+    timepoints = np.arange(end_frame-init_frame) / camera_fps
+    return end_frame, init_frame, stim_duration, timepoints
 
 
 @app.cell
 def _(analysis_methods, df, end_frame, init_frame, plot_yaw_angular_velocity):
     # To save processing time, let's just include non-stationary trials (travel distance over 10 cm during 25-s stimulus presentation)
+
+    ## Warning, in the default setting, the function will calculate 95% bootstrap confidence interval around median value of angular velocity. This will takes time. So either you go to the function in the plotting_utils and turn "using_bs_ci" to False to quickly view the data, or you skip this function when you run out of time
+
     analysis_methods.update({"active_trials_only":True})
     _colormap_name = "coolwarm"
     fig,_fig_tbt=plot_yaw_angular_velocity(df,analysis_methods,init_frame,end_frame,"all",_colormap_name)
@@ -221,12 +225,11 @@ def _(mo):
 
 
 @app.cell
-def _(boolean_array_to_event_table, camera_fps, np):
+def _(boolean_array_to_event_table, np):
     # just activate this function and we will use it later
     def detecting_following_events(
-        _this_sample_size: int,_this_target_speed: float, _coherence_index: int,arr:np.ndarray, df):
-        timepoints = np.arange(arr.shape[1]) / camera_fps
-        coherence_levels=[0,33,66,100]
+        _this_sample_size: int,_this_target_speed: float, _coherence_index: int,arr:np.ndarray, df,timepoints):
+        coherence_levels=np.sort(abs(df["stim_type"]).unique())
         _coherence_to_analyse=coherence_levels[_coherence_index]
         _hit_target_epochs = arr > _this_target_speed
         _trial_to_analyse = abs(df['stim_type']) == _coherence_to_analyse
@@ -322,10 +325,10 @@ def _(mo):
 
 
 @app.cell
-def _(arr, detecting_following_events, df, fit_model, form, mo):
+def _(arr, detecting_following_events, df, fit_model, form, mo, timepoints):
     mo.stop(form.value is None, mo.md("Click **Go, Hidden Scientists!** to fit a model to the data and adjust the parameters with sliders "))
     _v = form.value
-    following_events = detecting_following_events(_v["sample_size"], _v["angular_speed_thresholds"], _v["coherence_levels"],arr,df)
+    following_events = detecting_following_events(_v["sample_size"], _v["angular_speed_thresholds"], _v["coherence_levels"],arr,df,timepoints)
     fit_model(following_events)
     return
 
@@ -355,26 +358,18 @@ def _(mo):
 
 
 @app.cell
-def _(arr, camera_fps, df, np):
+def _(df, np):
     #parameter space to explore
     coherence_levels=np.sort(abs(df['stim_type']).unique())# Here are coherence level irrespective to moving direction
     colours = ['y', 'c', 'm', 'k']# Here are colour name for each coherence level
     sample_sizes = np.arange(8, 101, 7)# Here are the number for consecutive frame lengh
     _stimulus_angular_speed = 64 * np.pi / 180 # Here is the angular velocity of the stimulus. 64 degree/s was the setting when designing this protocol
     angular_speed_thresholds = [round(0.5 * _stimulus_angular_speed, 2), round(_stimulus_angular_speed, 2), round(2 * _stimulus_angular_speed, 2)]# Makes the threshold for angular speed, half of the stimulus angular speed, once stimulus angular speed, and twice stimulus angular speed
-    onset_in_sec = 0
-    timepoints = np.arange(arr.shape[1]) / camera_fps
-    post_times = timepoints[timepoints > onset_in_sec] - onset_in_sec
-    post_times
-    return (
-        angular_speed_thresholds,
-        coherence_levels,
-        colours,
-        onset_in_sec,
-        post_times,
-        sample_sizes,
-        timepoints,
-    )
+
+    #these lines are only necessary if the onset of stimulus is not aligned to be 0 sec 
+    #onset_in_sec = 0
+    #post_times = timepoints[timepoints > onset_in_sec] - onset_in_sec
+    return angular_speed_thresholds, coherence_levels, colours, sample_sizes
 
 
 @app.cell
@@ -386,9 +381,7 @@ def _(
     coherence_levels,
     colours,
     df,
-    onset_in_sec,
     plt,
-    post_times,
     sample_sizes,
     stim_duration,
     timepoints,
@@ -409,13 +402,13 @@ def _(
         for _i, _this_coherence in enumerate(coherence_levels):
             _trial_to_analyse = abs(df['stim_type']) == _this_coherence
             _this_data = _hit_target_epochs[df[_trial_to_analyse].index,]
-            _, _qualifying = boolean_array_to_event_table(_this_data, timepoints=timepoints, stimulus_onset=onset_in_sec, consecutive_samples=_this_sample_size)
+            _, _qualifying = boolean_array_to_event_table(_this_data, timepoints=timepoints, stimulus_onset=0, consecutive_samples=_this_sample_size)
             probability, lower, upper = bootstrap_cumulative_probability(_qualifying, n_resamples=99, confidence_level=0.95, seed=42, subject_ids=None)
-            event_times = post_times[:_qualifying.shape[1]]
+            event_times = timepoints[:_qualifying.shape[1]]
             _axes[_j].plot(event_times, probability, color=colours[_i], label=f"{_this_coherence}%")
             _axes[_j].fill_between(event_times, lower, upper,color=colours[_i], alpha=0.25)
             if _j==0:
-                _axes[_j].set(xlabel='time since stimulus onset (s)', ylabel='probability of success (%)', xticks=[onset_in_sec, stim_duration], ylim=(0, 1), yticks=[0, 0.5, 1], yticklabels=['0', '50', '100'])
+                _axes[_j].set(xlabel='time since stimulus onset (s)', ylabel='probability of success (%)', xticks=[0, stim_duration], ylim=(0, 1), yticks=[0, 0.5, 1], yticklabels=['0', '50', '100'])
     _fig
     return
 
@@ -453,7 +446,6 @@ def _(
     coherence_levels,
     df,
     np,
-    onset_in_sec,
     sample_sizes,
     timepoints,
 ):
@@ -473,7 +465,7 @@ def _(
         for _j, _this_sample_size in enumerate(sample_sizes):
             _trial_to_analyse = abs(df['stim_type']) == _coherence_to_analyse
             _this_data = _hit_target_epochs[df[_trial_to_analyse].index,]
-            _time_to_success_pd, _ = boolean_array_to_event_table(_this_data, timepoints=timepoints, stimulus_onset=onset_in_sec, consecutive_samples=_this_sample_size)
+            _time_to_success_pd, _ = boolean_array_to_event_table(_this_data, timepoints=timepoints, stimulus_onset=0, consecutive_samples=_this_sample_size)
             _results = Fit_Everything(failures=_time_to_success_pd[_time_to_success_pd['event'] == 1]['time'].values, right_censored=_time_to_success_pd[_time_to_success_pd['event'] == 0]['time'].values, exclude=_model_excluded, show_probability_plot=False, print_results=False, show_best_distribution_probability_plot=False, show_histogram_plot=False, show_PP_plot=False) ## Note, you can turn these plotting argument in the Fit_Everything function to True and see the fitting results.
 
             _sorted_results = _results.results.sort_values('Distribution')# by default, the Fit_Everything function will sort the model based on which performance the best. This is however, not good for consistently storing output variables across parameters. Therefore, I sort the result based on the alphabetically order in the model name.
@@ -528,13 +520,12 @@ def _(
     coherence_levels,
     df,
     np,
-    onset_in_sec,
     sample_sizes,
     timepoints,
 ):
-    _coherence_to_analyse=coherence_levels[3]
+    _coherence_to_analyse=coherence_levels[3]# choose one of the coherence level to focus on
     _consider_censored_data=True
-    ready_to_plot_kappa = np.zeros((len(angular_speed_thresholds), sample_sizes.shape[0]))
+    ready_to_plot_kappa = np.zeros((len(angular_speed_thresholds), sample_sizes.shape[0]))## Here is one way to store output kappa across parameters. I prefer to first declaring empty 3D matrex and then fill in those output values based on indexes along each axis
     ready_to_plot_kappa_lower = np.zeros((len(angular_speed_thresholds), sample_sizes.shape[0]))
     ready_to_plot_kappa_upper = np.zeros((len(angular_speed_thresholds), sample_sizes.shape[0]))
     for _i, _this_target_speed in enumerate(angular_speed_thresholds):
@@ -542,7 +533,7 @@ def _(
         for _j, _this_sample_size in enumerate(sample_sizes):
             _trial_to_analyse = abs(df['stim_type']) == _coherence_to_analyse
             _this_data = _hit_target_epochs[df[_trial_to_analyse].index,]
-            output_table, _qualifying = boolean_array_to_event_table(_this_data, timepoints=timepoints, stimulus_onset=onset_in_sec, consecutive_samples=_this_sample_size)
+            output_table, _qualifying = boolean_array_to_event_table(_this_data, timepoints=timepoints, stimulus_onset=0, consecutive_samples=_this_sample_size)
             if _consider_censored_data:
                 _wbf = Fit_Weibull_DS(failures=output_table[output_table['event'] == 1]['time'].values, right_censored=output_table[output_table['event'] == 0]['time'].values, show_probability_plot=False, print_results=True)
             else:
