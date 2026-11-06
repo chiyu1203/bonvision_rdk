@@ -4,6 +4,32 @@ import numpy as np
 import pandas as pd
 import scipy.stats as st
 
+def get_dataset_dir():
+    system = platform.system()
+
+    if system == "Windows":
+        dataset_dir = Path(
+            r"Z:\DATA\experiment_trackball_Optomotor\MatrexVR"
+        )
+
+    elif system == "Darwin":  # macOS
+        dataset_dir = Path(
+            "/Volumes/AG_Couzin-Fuchs/DATA/experiment_trackball_Optomotor/MatrexVR"
+        )
+
+    elif system == "Linux":
+        raise NotImplementedError("Configure the Linux dataset path.")
+
+    else:
+        raise OSError(f"Unsupported operating system: {system}")
+
+    if not dataset_dir.is_dir():
+        raise FileNotFoundError(
+            f"Dataset directory does not exist: {dataset_dir}"
+        )
+
+    return dataset_dir
+
 def generate_index_points(stim_to_analyse, analysis_window, camera_fps):
     window_length = analysis_window[1] - analysis_window[0]
     interval_onset = (
