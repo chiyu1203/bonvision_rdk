@@ -1,8 +1,9 @@
 # General information about this folder.
 While the stimulus code was made in Bonsai, the analysis codes were written in Python.
 They were tested under both Window 11 and MacOS, so as long as the coding environment is ready, the computer's operating system is not an issue.<br />
-
+<br />
 Here we will go through how to set up the coding environment in python, and then open [marimo](https://docs.marimo.io/) notebook to access the data.<br />
+<br />
 Marimo notebook is similar to jupyter notebook, where you can interact with codes cell by cell (or block by block). Nevertheless, the biggest difference between the two is that Marimo notebook can automatically synchronise the value of global variables to all of the activated cells. This helps demonstrate a database like this, because you do not need to remember which cells to activate and which ones to skip. User feedback is updated automatically. However, jupyter notebook still has better support in other asepects but I found it trickier to prototype a script on Marimo (The promising thing is that Marimo has built up their APIs for users to convert notebooks from juypter notebook to Marimo notebook vice versa).
 
 #### A useful tip for new Marimo notebook users: get used to local variables and global variables
@@ -19,7 +20,7 @@ Install the latest anaconda version for your operating system (https://www.anaco
 
 If you prefer to to use environment.yml or requirements.txt files to install the packages on the list:
 ```
-#choose one of the commends to create the virutla environment
+#choose one of the commends to create the virtual environment
 conda env create -f environment.yml
 conda create --name analysis --file requirements.txt
 ```
@@ -28,7 +29,7 @@ Then activate your virtual environment with
 conda activate analysis
 ```
 Based on my experience, the requirements.txt file works better. Not sure if this is because I have installed packages via pip so some configuration in the environment.yml might be missing <br />
-Alternatively, you can use the following commands to create a virtual environment and intall python packages inside the environment.
+Alternatively, you can use the following commands to create a virtual environment and install python packages inside the environment.
 ```
 conda create --name analysis --channel conda-forge python=3.14
 conda activate analysis
@@ -84,7 +85,7 @@ go to that folder and then type. This commend turns the folder into a uv folder 
 ```
 uv init
 ```
-Once the project is created, type the following to create a virtual environment named "venv" wit python 3.14 version
+Once the project is created, type the following to create a virtual environment named "venv" under python 3.14 version
 ```
 uv venv --python 3.14  
 ```
@@ -98,18 +99,18 @@ source ./.venv/bin/activate
 To add python dependencies inside the project
 ```
 uv add scipy pandas matplotlib pyarrow fastparquet deepdiff tables ipyparallel seaborn h5py reliability marimo numpy zenodo-get
-
+```
 [Optional] To remove a python package from the project
+
 ```
 uv remove h5py
 ```
 
-[Optional] To synchronise you uv projeccts with added dependencies
+[Optional] To synchronise you uv projects with added dependencies
 ```
 uv sync
 ```
 
-```
 To run marimo notebook (Similar to the note for conda users, I would recommend to start from notebook_download_dataset.py, followed by notebook_raw_dataset.py and finally notebook_curated_dataset.py, but you can skip the notebook_download_dataset.py if you already have access to the dataset). 
 ```
 #similarly, there are two modes to choose from, so just run one of the commands
@@ -125,7 +126,7 @@ Here is how a marimo notebook look like
 
 ## How to use the notebook
 
-Usually, in a notebook like this, as long as you go through commmands cell by cell, you will more or less understand the analysis. However, in this repository, there is also a notebook to create curated data based on raw data. Therefore, it should be better if some flexibility is left in the notebook and users can decide how to analyse the data themselves.<br />
+Usually, in a notebook like this, as long as you go through commands cell by cell, you will more or less understand the analysis. However, in this repository, there is also a notebook (notebook_raw_dataset.py) to create curated data based on raw data. Therefore, it should be better if some flexibility is left in the notebook and users can decide how to analyse the data themselves.<br />
 When I manage different ways of analysis, I loaded those variables (or input arguments for a function) into a dictionary form, so that I can change and monitor those variables.<br />
 
 Below is the dictionary used in the analysis
