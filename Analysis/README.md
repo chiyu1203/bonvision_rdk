@@ -122,3 +122,42 @@ Here is how a marimo notebook look like
 <img width="828" height="673" alt="Screenshot 2026-10-30 at 14 46 05" src="https://github.com/user-attachments/assets/20fa3af8-4e0d-4dfb-9124-dea037457d87" />
 
 (use Ctrl + C, to terminate an operating notebook)
+
+## How to use the notebook
+
+Usually, in a notebook like this, as long as you go through commmands cell by cell, you will more or less understand the analysis. However, in this repository, there is also a notebook to create curated data based on raw data. Therefore, it should be better if some flexibility is left in the notebook and users can decide how to analyse the data themselves.<br />
+When I manage different ways of analysis, I loaded those variables (or input arguments for a function) into a dictionary form, so that I can change and monitor those variables.<br />
+
+Below is the dictionary used in the analysis
+
+
+```
+    "exp_place": "MatrexVR",# where the experiment takes place? No need to change anything here
+    "temperature_data_options": "el_usb", # which temperature logger was used in this dataset? No need to change anything here
+    "active_trials_only": true, # whether to only include trials where animals walk longer than 10 cm (an arbitrary threshold set in the function "plot_yaw_angular_velocity") when plotting median angular velocity?
+    "filtering_method": "rolling_median", # methods to smooth the raw data. You can choose between rolling_median or sg_filter (savgol_filter). The method is applied in "notebook_raw_dataset.py" for the position (x,y) and angular velocity. Note: in the curated database, animals' walking distance was estimated based on their location being smoothed by savgol_filter, but the angular velocity was not smoothed. 
+    "yaw_axis": "z", # which axis represents the yaw axis in this dataset? No need to change anything here 
+    "camera_fps": 100, # How many frames were acquired by the camera in a second? No need to change anything here 
+    "stim_duration": 25, # How long was the stimulus presentation? No need to change anything here
+    "interval_duration": [
+        10,
+        15
+    ], # How long was the inter-stimulus intervals? No need to change anything here 
+    "analysis_window": [
+    -10,
+    35
+    ], # From when to when would you like to extract and align the angular velocity for further analysis. 0 marks the onset of the stimulus. These default values means extract angular velocities between 10 second prior to the stimulus presentation and 35 second after the stimulus presentation in every trial
+    "prestim_duration": 300 # How long was the grey screen prior to any stimulus and inter-stimulus interval? No need to change anything here 
+```
+This python dictionary is stored as .json file.<br />
+You can load this dictionary with the following command.
+```
+_file_name = './analysis_methods_dictionary.json'
+with open(_file_name, 'r') as _f:
+    analysis_methods = json.loads(_f.read())
+```
+
+You can change any variables in this dictionary with the following command.
+```
+analysis_methods.update({"active_trials_only":True})
+```
