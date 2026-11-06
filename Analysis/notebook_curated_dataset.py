@@ -54,7 +54,7 @@ def _():
     import pandas as pd
     import matplotlib.pyplot as plt
     import seaborn as sns
-    from utils import boolean_array_to_event_table, bootstrap_cumulative_probability, converting_follow_velocity,bfill
+    from utils import boolean_array_to_event_table, bootstrap_cumulative_probability, converting_follow_velocity,bfill,get_dataset_dir
     from plotting_utils import plot_example_trajectory, plot_yaw_angular_velocity, heatmap, annotate_heatmap
     from reliability.Fitters import Fit_Weibull_2P,Fit_Everything,Fit_Exponential_1P,Fit_Weibull_DS,Fit_Weibull_Mixture,Fit_Exponential_2P
         ## A useful function to generate a data list for further analysis
@@ -69,12 +69,12 @@ def _():
         Fit_Weibull_2P,
         Fit_Weibull_DS,
         Fit_Weibull_Mixture,
-        Path,
         annotate_heatmap,
         boolean_array_to_event_table,
         bootstrap_cumulative_probability,
         converting_follow_velocity,
         custom_5,
+        get_dataset_dir,
         heatmap,
         json,
         mo,
@@ -119,14 +119,11 @@ def _(mo):
 
 
 @app.cell
-def _(Path, pd):
+def _(get_dataset_dir, pd):
     #The benefit of saving database in parquet.gzip is long-term storage but loading it takes time...
-    _folder_name = 'MatrexVR'
-    #_Datasets = 'Z:/DATA/experiment_trackball_Optomotor'
-    _Datasets ='/Volumes/AG_Couzin-Fuchs/DATA/experiment_trackball_Optomotor/'
-    this_dataset_dir = f'{_Datasets}/{_folder_name}'#change here if the dataset is on your computer
+    this_dataset_dir = get_dataset_dir()#change here if the dataset is on your computer
     _file_name = 'MatrexVR_4coherence_database.parquet.gzip'
-    df = pd.read_parquet(Path(this_dataset_dir) / _file_name)
+    df = pd.read_parquet(this_dataset_dir / _file_name)
     return (df,)
 
 
