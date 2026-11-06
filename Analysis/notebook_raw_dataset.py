@@ -167,10 +167,11 @@ def _(
     smooth_window_length,
     yaw_axis,
 ):
-    if filtering_method == "sg_filter":
+    if filtering_method == "sg_filter" or filtering_method == "savgol_filter":
         x_all = savgol_filter(df.loc[:, ["intergrated x position"]].values[:,0], smooth_window_length, 3, axis=0)
         y_all = savgol_filter(df.loc[:, ["intergrated y position"]].values[:,0], smooth_window_length, 3, axis=0)
-        yaw_angular_velocity =df.loc[:, [f"delta rotation vector lab {yaw_axis}"]].values[:,0]
+        yaw_angular_velocity = savgol_filter(df.loc[:, [f"delta rotation vector lab {yaw_axis}"]].values[:,0], smooth_window_length, 3, axis=0)
+        #yaw_angular_velocity =df.loc[:, [f"delta rotation vector lab {yaw_axis}"]].values[:,0]
     elif filtering_method == "rolling_median":
         x_all =df.loc[:, ["intergrated x position"]].rolling(smooth_window_length).median().values
         y_all = df.loc[:, ["intergrated y position"]].rolling(smooth_window_length).median().values
