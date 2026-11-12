@@ -1,5 +1,11 @@
 # BonVision random dot kinematogram
+
+
 ## Introduction
+
+https://github.com/user-attachments/assets/d818ba12-604b-470a-b8e6-6535409b6c53
+
+
 <img width="312" height="131" alt="bonsai_bonvision" src="https://github.com/user-attachments/assets/c760b664-ac1f-4ada-bf24-b14f22d188e4" /><br />
 This is a repository storing a workflow to present random dot kinematograms with [BonVision](https://bonvision.github.io/) package in [Bonsai](https://bonsai-rx.org/).
 
