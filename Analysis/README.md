@@ -2,7 +2,9 @@
 While the stimulus code was made in Bonsai, the analysis codes were written in Python.
 They were tested under both Window 11 and MacOS, so as long as the coding environment is ready, the computer's operating system is not an issue.<br />
 <br />
-Here we will go through how to set up the coding environment in python, and then open [marimo](https://docs.marimo.io/) notebook to access the data.<br />
+Here, we prepared jupyter notebook, html files for you to have a preview about the analysis (html files can not be viewed on GitHub so you would need to clone or download the repository first). We have started to test [marimo](https://docs.marimo.io/) notebook to give our users an interactive experiences.<br />
+
+We will go through how to set up the coding environment in python, and then open those notebooks to access the data.<br />
 
 https://github.com/user-attachments/assets/ecaac19f-9bb2-442c-8e09-be1a96f453c6
 
@@ -37,7 +39,7 @@ conda create --name analysis --channel conda-forge python=3.14
 conda activate analysis
 conda update -n base -c defaults conda
 conda config --add channels conda-forge
-conda install --yes -c conda-forge -v matplotlib seaborn pytables marimo fastparquet pyarrow numpy scipy pandas
+conda install --yes -c conda-forge -v matplotlib seaborn pytables marimo fastparquet pyarrow numpy scipy pandas jupyterlab
 ```
 Two packages are not stored in conda so we need to install them via pip
 ```
@@ -100,10 +102,13 @@ source ./.venv/bin/activate
 ```
 To add python dependencies inside the project
 ```
-uv add scipy pandas matplotlib pyarrow fastparquet deepdiff tables ipyparallel seaborn h5py reliability marimo numpy zenodo-get
+uv add scipy pandas matplotlib pyarrow fastparquet deepdiff tables ipyparallel seaborn h5py reliability marimo numpy zenodo-get nbformat
+```
+[Optional] To add jupyter lab in the project
+```
+uv add --dev jupyter ipykernel 
 ```
 [Optional] To remove a python package from the project
-
 ```
 uv remove h5py
 ```
@@ -112,7 +117,7 @@ uv remove h5py
 ```
 uv sync
 ```
-
+## How to run the notebooks on Marimo
 To run marimo notebook (Similar to the note for conda users, I would recommend to start from notebook_download_dataset.py, followed by notebook_raw_dataset.py and finally notebook_curated_dataset.py, but you can skip the notebook_download_dataset.py if you already have access to the dataset). 
 ```
 #similarly, there are two modes to choose from, so just run one of the commands
@@ -126,6 +131,16 @@ Here is how a marimo notebook look like
 
 (use Ctrl + C, to terminate an operating notebook)
 
+
+## How to run the notebooks on Jupyter lab
+If you install jupyter with uv, you can open the Jupyter lab on the browser with the following command
+```
+uv run --with jupyter jupyter lab  
+```
+Or if you install jupyter with conda, first activate the virtual environment and then type
+```
+jupyter lab
+```
 ## How to use the notebook
 
 Usually, in a notebook like this, as long as you go through commands cell by cell, you will more or less understand the analysis. However, in this repository, there is also a notebook (notebook_raw_dataset.py) to create curated data based on raw data. Therefore, it should be better if some flexibility is left in the notebook and users can decide how to analyse the data themselves.<br />
