@@ -136,6 +136,7 @@ Below is the dictionary used in the analysis
 
 ```
     "exp_place": "MatrexVR",# where the experiment takes place? No need to change anything here
+    "experiment_name": "coherence",# the name of the experiment. No need to change anything here
     "temperature_data_options": "el_usb", # which temperature logger was used in this dataset? No need to change anything here
     "active_trials_only": true, # whether to only include trials where animals walk longer than 10 cm (an arbitrary threshold set in the function "plot_yaw_angular_velocity") when plotting median angular velocity?
     "filtering_method": "rolling_median", # methods to smooth the raw data. You can choose between rolling_median or sg_filter (savgol_filter). The method is applied in "notebook_raw_dataset.py" for the position (x,y) and angular velocity. Note: in the curated database, animals' walking distance was estimated based on their location being smoothed by savgol_filter, but the angular velocity was not smoothed. 

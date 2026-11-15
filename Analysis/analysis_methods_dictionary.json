@@ -1,5 +1,6 @@
 {
     "exp_place": "MatrexVR",
+    "experiment_name": "coherence",
     "temperature_data_options": "el_usb",
     "active_trials_only": true,
     "filtering_method": "rolling_median",

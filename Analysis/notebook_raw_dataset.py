@@ -171,8 +171,8 @@ def _(
         x_all = savgol_filter(df.loc[:, ["intergrated x position"]].values[:,0], smooth_window_length, 3, axis=0)
         y_all = savgol_filter(df.loc[:, ["intergrated y position"]].values[:,0], smooth_window_length, 3, axis=0)
         yaw_angular_velocity = savgol_filter(df.loc[:, [f"delta rotation vector lab {yaw_axis}"]].values[:,0], smooth_window_length, 3, axis=0)
-        #yaw_angular_velocity =df.loc[:, [f"delta rotation vector lab {yaw_axis}"]].values[:,0]
-    elif filtering_method == "rolling_median":
+
+    elif filtering_method == "rolling_median":# when applying rolling median to the dataset, NaN value can not be processed. Therefore, we need to apply backward filling methods to fill in those NaN value with the nearest element. The NaN value, if it ever appers, only appears in the beginning of an experiment so it is not going to influence the analysis of trial-related responses
         x_all =df.loc[:, ["intergrated x position"]].rolling(smooth_window_length).median().values
         y_all = df.loc[:, ["intergrated y position"]].rolling(smooth_window_length).median().values
         yaw_angular_velocity =df.loc[:, [f"delta rotation vector lab {yaw_axis}"]].rolling(smooth_window_length).median().values
@@ -210,6 +210,8 @@ def _(
     y_all,
     yaw_angular_velocity,
 ):
+    #The first argument after yaw angular veloctiy is start_frame. This is meant to specifiy from which frame you would like to draw the trajectory. end_frame, on the other hand, specifies until which frame to stop drawing the trajectory. start_markers used to denote the start of a trial, whereas the end_marker denotes the end of a trial.
+
     plot_example_trajectory(x_all,y_all,yaw_angular_velocity=yaw_angular_velocity,start_frame=411341,end_frame=420430,start_marker=[412857,416894],end_marker=[415381,419418],analysis_methods=analysis_methods)
     #The output here is the figure 1B and 1C in Lee et al., 2026 
     return
@@ -339,14 +341,14 @@ def _(mo):
 
 
 @app.cell
-def _():
+def _(analysis_methods):
     #Since we know how long is the grey screen, we can ignore those readouts based on time and then focus on converting readings from the two phases into transition from the LED on-to-off phase and from the off-to-on phase
-    pre_stim_grey_screen=300
+    pre_stim_grey_screen=analysis_methods.get("prestim_duration")
     #Setting an arbitrary threshold to split the two phase
     transition_threshold=410000
     #to prevent noisy signals from crossing the threshold (false positive detection), we can specify minimal duration for each phase based on how long the inter-stimulus-interval and stimulus presentation were designed in the experiment
-    _min_stim=25
-    _min_interval=10
+    _min_stim=analysis_methods.get("stim_duration")
+    _min_interval=min(analysis_methods.get("interval_duration"))
     min_phase_duration=[_min_stim,_min_interval]
     return min_phase_duration, pre_stim_grey_screen, transition_threshold
 
@@ -490,7 +492,7 @@ def _(
     end_frame=(abs(analysis_window[0])+analysis_window[1])*camera_fps
     _fig,_fig_tbt=plot_yaw_angular_velocity(curated_dataset_df[curated_dataset_df["Path"].str.contains(animal_ID)],analysis_methods,init_frame=init_frame,end_frame=end_frame,vr_no="single")
     _fig
-    return
+    return end_frame, init_frame
 
 
 @app.cell(hide_code=True)
@@ -504,8 +506,32 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ### Session 5.1: visualising animal's velocity
+    ### Session 5.1: calculating animal's speed
     """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    #### We can calculate the animal's speed by getting how far they move every frame (in euclidean distance) and then divided the time difference between each frame (or multipled by the camera acqusition rate)
+    """)
+    return
+
+
+@app.cell
+def _(np):
+    def euclidean_distance(X,Y):
+        return np.sqrt(np.add(np.square(np.diff(X)), np.square(np.diff(Y))))
+
+    return (euclidean_distance,)
+
+
+@app.cell
+def _(camera_fps, euclidean_distance, x_all, y_all):
+    _travel_distance_fbf = euclidean_distance(x_all,y_all)
+    speed=_travel_distance_fbf*camera_fps
+    print(speed)
     return
 
 
@@ -514,6 +540,34 @@ def _(mo):
     mo.md(r"""
     ### Session 5.2: calculating optomotor index
     """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    #### Here, we can define an index to quantify optomotor walking behaviour as the net angular velocities (clockwises and clockwise) for a given trial, normalised by the sum of the absolute value of the angular velocities. This index gives you an easy way to check how well the animal respond to rotational cues (at the cost of losing details of the turning behaviour because all the data is compressed into a single value).
+    For details, please refer to [Sayin et al. 2025](https://www.science.org/doi/10.1126/science.adq7832), and [Seelig et al., 2010](https://www.nature.com/articles/nmeth.1468).
+    """)
+    return
+
+
+@app.cell
+def _(np):
+    def optomotor_response_idx(ev_dat):
+        opt_idx = (
+            np.nansum(abs(ev_dat[ev_dat > 0])) - np.nansum(abs(ev_dat[ev_dat < 0]))
+        ) / (np.nansum(abs(ev_dat[ev_dat < 0])) + np.nansum(abs(ev_dat[ev_dat > 0])))
+        return opt_idx
+
+    return (optomotor_response_idx,)
+
+
+@app.cell
+def _(angular_velocity_tbt, end_frame, init_frame, optomotor_response_idx):
+    #calculate optomotor index: You need to specify from which frame to which frame and at trial to calculate the optomotor index. The example here shows you the calculation of optomotor index at the first trial, from the start of the stimulation presentation until the end of the stimulus presentation 
+    opt_idx=optomotor_response_idx(angular_velocity_tbt[0,init_frame:end_frame])
+    print(opt_idx)
     return
 
 
