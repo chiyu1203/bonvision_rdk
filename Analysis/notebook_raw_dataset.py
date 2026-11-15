@@ -7,7 +7,7 @@ app = marimo.App()
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    # Accessing dataset Random Dot Kinematograms in Desert Locusts on Marimo notebook
+    # Accessing dataset random dot kinematograms in desert Locusts on Marimo notebook
     """)
     return
 
